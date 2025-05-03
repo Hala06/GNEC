@@ -1,13 +1,19 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
-import './styles/global.css'
-import { AnimatePresence } from 'framer-motion'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
+import App from './App';
+import './styles/global.css';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+// Initialize the app
+const root = ReactDOM.createRoot(document.getElementById('root'));
+
+root.render(
   <React.StrictMode>
-    <AnimatePresence mode="wait">
-      <App />
-    </AnimatePresence>
+    <BrowserRouter>
+      <AnimatePresence mode="wait">
+        <App />
+      </AnimatePresence>
+    </BrowserRouter>
   </React.StrictMode>
-)
+);

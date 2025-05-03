@@ -1,43 +1,66 @@
-import { useRef, useEffect } from 'react';
-import Navbar from './components/Navbar'
-import HeroSection from './components/HeroSection'
-import SectionDivider from './components/SectionDivider'
-import Features from './components/Features'
-import TextToSpeechAndClickToRead from './components/TextToSpeechAndClickToRead'
-import About from './components/About'
-import Footer from './components/Footer'
-import BackgroundBlobs from './components/BackgroundBlobs'
-import ScrollButton from './components/ScrollButton'
-import Stars from './components/Stars'
+import { useEffect, useRef } from 'react';
+import { initTheme } from './utils/helpers';
+import { AccessibilityProvider } from './contexts/AccessibilityContext';
+
+// Layout Components
+import Navbar from './components/layout/Navbar/Navbar';
+import Footer from './components/layout/Footer/Footer';
+
+// UI Components
+import BackgroundBlobs from './components/Ui/BackgroundBlobs';
+import Stars from './components/Ui/Stars';
+import SectionDivider from './components/Ui/SectionDivider';
+import ScrollButton from './components/core/ScrollButton';
+
+// Section Components
+import HeroSection from './components/sections/Hero/HeroSection';
+import Features from './components/sections/Features/Features';
+import TextToSpeechDemo from './components/sections/Demo/TextToSpeechAndClickToRead';
+import About from './components/sections/About/About';
+
+// Accessibility Components
+import CursorHighlighter from './components/accessibility/CursorHighlighter';
+import FocusBorder from './components/accessibility/FocusBorder';
+import ScreenReader from './components/accessibility/ScreenReader';
 
 function App() {
+  const appRef = useRef();
+
+  // Initialize theme
+  useEffect(() => {
+    initTheme();
+  }, []);
+
   return (
-    <main>
-      <BackgroundBlobs />
-      <Stars />
-      <div style={{
-        backgroundColor: 'var(--background)',
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        overflowX: 'hidden',
-        paddingTop: '80px',
-        position: 'relative',
-        zIndex: 1
-      }}>
+    <AccessibilityProvider>
+      <div className="app-container" ref={appRef}>
+        {/* Visual Effects */}
+        <BackgroundBlobs />
+        <Stars />
+        
+        {/* Accessibility Features */}
+        <CursorHighlighter />
+        <FocusBorder />
+        <ScreenReader />
+        
+        {/* Main Layout */}
         <Navbar />
-        <HeroSection />
-        <SectionDivider variant={1} />
-        <Features />
-        <SectionDivider variant={2} />
-        <TextToSpeechAndClickToRead />
-        <SectionDivider variant={3} />
-        <About />
-        <Footer />
-        <ScrollButton />
+        
+        <main className="content-wrapper">
+          <HeroSection />
+          <SectionDivider variant={1} />
+          <Features />
+          <SectionDivider variant={2} />
+          <TextToSpeechDemo />
+          <SectionDivider variant={3} />
+          <About />
+          <Footer />
+        </main>
+        
+        <ScrollButton containerRef={appRef} />
       </div>
-    </main>
-  )
+    </AccessibilityProvider>
+  );
 }
 
-export default App
+export default App;

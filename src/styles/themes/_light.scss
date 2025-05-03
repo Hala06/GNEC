@@ -1,0 +1,46 @@
+[data-theme="light"] {
+    // Color palette
+    --background: #F5F7F9;
+    --text: #1a202c;
+    --accent: #4A90A8;
+    --secondary: #E7EEF0;
+    --border: #88B5C1;
+    --hover: #3A7A8F;
+    --error: #FF6B6B;
+    --success: #6BCB77;
+    --warning: #FFD166;
+  
+    // Blob colors
+    --blob-1: rgba(100, 149, 237, 0.15);
+    --blob-2: rgba(147, 112, 219, 0.15);
+    --blob-3: rgba(72, 209, 204, 0.15);
+  
+    // Stars
+    --star-color: rgba(74, 144, 168, 0.7);
+    --star-opacity: 0.3;
+  
+    // Text contrasts
+    --text-primary: var(--text);
+    --text-secondary: rgba(26, 32, 44, 0.8);
+    --text-tertiary: rgba(26, 32, 44, 0.6);
+  
+    // Shadows
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  
+    // Gradients
+    --gradient-primary: linear-gradient(135deg, #F5F7F9, #E7EEF0);
+    --gradient-secondary: linear-gradient(135deg, #4A90A8, #3A7A8F);
+    --gradient-accent: linear-gradient(45deg, #88B5C1, #4A90A8);
+  
+    // Specific component theming
+    .card {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+  
+    .navbar {
+      backdrop-filter: blur(10px);
+      background: rgba(245, 247, 249, 0.9);
+    }
+  }

@@ -1,0 +1,115 @@
+// Base card styles
+.card {
+    background: var(--secondary);
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 20px rgba(var(--text-rgb), 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    position: relative;
+  
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(var(--text-rgb), 0.1);
+    }
+  
+    // Accessibility focus styles
+    &:focus-within {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+  }
+  
+  // Card variants
+  .card--elevated {
+    box-shadow: 0 8px 32px rgba(var(--text-rgb), 0.1);
+  }
+  
+  .card--outlined {
+    background: transparent;
+    border: 2px solid var(--border);
+  }
+  
+  .card--interactive {
+    cursor: pointer;
+  
+    &:hover {
+      .card__title {
+        color: var(--accent);
+      }
+    }
+  }
+  
+  // Card elements
+  .card__media {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  .card__content {
+    padding: 1.5rem;
+  }
+  
+  .card__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text);
+    transition: color 0.3s ease;
+  }
+  
+  .card__description {
+    color: var(--text);
+    opacity: 0.8;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  
+  .card__footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .card__badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--accent);
+    color: var(--background);
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  // Card sizes
+  .card--small {
+    .card__content {
+      padding: 1rem;
+    }
+  
+    .card__title {
+      font-size: 1rem;
+    }
+  }
+  
+  .card--large {
+    .card__content {
+      padding: 2rem;
+    }
+  
+    .card__title {
+      font-size: 1.5rem;
+    }
+  }
+  
+  // Accessibility features for cards
+  [data-a11y-highlight="true"] {
+    .card {
+      border: 2px solid var(--accent);
+    }
+  }

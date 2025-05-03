@@ -1,0 +1,44 @@
+/* src/styles/theme.css */
+:root {
+    /* Light Theme Variables */
+    --background: #F5F7F9;
+    --text: #1a202c;
+    --accent: #4A90A8;
+    --secondary: #E7EEF0;
+    --border: #88B5C1;
+    --hover: #3A7A8F;
+    
+    /* Blob Colors */
+    --blob-1: rgba(100, 149, 237, 0.15);
+    --blob-2: rgba(147, 112, 219, 0.15);
+    --blob-3: rgba(72, 209, 204, 0.15);
+    
+    /* Stars */
+    --star-color: rgba(255, 255, 255, 0.7);
+    
+    /* RGB versions for calculations */
+    --text-rgb: 26, 32, 44;
+    --accent-rgb: 74, 144, 168;
+  }
+  
+  [data-theme="dark"] {
+    /* Dark Theme Variables */
+    --background: #151528;
+    --text: #E9E9F0;
+    --accent: #8B85D8;
+    --secondary: #252540;
+    --border: #353550;
+    --hover: #A5A1E5;
+    
+    /* Blob Colors */
+    --blob-1: rgba(72, 61, 139, 0.15);
+    --blob-2: rgba(75, 0, 130, 0.15);
+    --blob-3: rgba(106, 90, 205, 0.15);
+    
+    /* Stars */
+    --star-color: rgba(255, 255, 255, 0.9);
+    
+    /* RGB versions */
+    --text-rgb: 233, 233, 240;
+    --accent-rgb: 139, 135, 179;
+  }

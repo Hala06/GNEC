@@ -1,20 +1,23 @@
 import { motion } from 'framer-motion';
-
-const blobVariants = {
-  animate: (i) => ({
-    x: [0, i % 2 === 0 ? 100 : -100, 0],
-    y: [0, i % 3 === 0 ? 50 : -50, 0],
-    scale: [1, 1.1, 1],
-    transition: {
-      duration: 20 + i * 5,
-      repeat: Infinity,
-      repeatType: 'reverse',
-      ease: 'easeInOut'
-    }
-  })
-};
+import { useAccessibility } from '/src/contexts/AccessibilityContext';
 
 const BackgroundBlobs = () => {
+  const { settings } = useAccessibility();
+  
+  const blobVariants = {
+    animate: (i) => ({
+      x: settings.reducedMotion ? 0 : [0, i % 2 === 0 ? 100 : -100, 0],
+      y: settings.reducedMotion ? 0 : [0, i % 3 === 0 ? 50 : -50, 0],
+      scale: settings.reducedMotion ? 1 : [1, 1.1, 1],
+      transition: {
+        duration: 20 + i * 5,
+        repeat: Infinity,
+        repeatType: 'reverse',
+        ease: 'easeInOut'
+      }
+    })
+  };
+
   const blobs = [
     { size: 300, color: 'var(--blob-1)', x: '20%', y: '10%' },
     { size: 400, color: 'var(--blob-2)', x: '70%', y: '50%' },
@@ -52,6 +55,7 @@ const BackgroundBlobs = () => {
             top: blob.y,
             mixBlendMode: 'soft-light'
           }}
+          aria-hidden="true"
         />
       ))}
     </div>

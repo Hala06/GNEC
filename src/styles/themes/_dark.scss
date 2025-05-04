@@ -10,6 +10,11 @@
     --success: #6BCB77;
     --warning: #FFD166;
   
+    // RGB versions for calculations
+    --background-rgb: 21, 21, 40;
+    --text-rgb: 233, 233, 240;
+    --accent-rgb: 139, 135, 216;
+  
     // Blob colors
     --blob-1: rgba(72, 61, 139, 0.15);
     --blob-2: rgba(75, 0, 130, 0.15);
@@ -17,7 +22,6 @@
   
     // Stars
     --star-color: rgba(255, 255, 255, 0.9);
-    --star-opacity: 0.8;
   
     // Text contrasts
     --text-primary: var(--text);

@@ -2,19 +2,21 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import elderlyImage from '/assets/images/elderly.jpg';
 import CTAButton from '../../../components/core/Buttons/CTAButton';
+import { useAccessibility } from '../../../contexts/AccessibilityContext';
 
 const HeroSection = () => {
+  const { settings } = useAccessibility();
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"]
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", settings.reducedMotion ? "0%" : "30%"]);
+  const opacity = useTransform(scrollYProgress, [0, 1], [1, settings.reducedMotion ? 1 : 0]);
 
   return (
-    <section 
+    <section
       ref={ref}
       id="hero"
       style={{
@@ -23,18 +25,11 @@ const HeroSection = () => {
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        background: 'var(--gradient-primary)'
       }}
+      aria-labelledby="hero-heading"
     >
-      {/* Background elements */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        background: 'radial-gradient(circle at 50% 50%, var(--accent) 0%, transparent 70%)',
-        filter: 'blur(100px)',
-        opacity: 0.15,
-        zIndex: 0
-      }} />
 
       <div style={{
         display: 'flex',
@@ -57,9 +52,10 @@ const HeroSection = () => {
           }}
         >
           <motion.h1
+            id="hero-heading"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: settings.reducedMotion ? 0 : 0.6, delay: 0.2 }}
             style={{
               fontSize: 'clamp(2.5rem, 5vw, 4rem)',
               lineHeight: '1.2',
@@ -71,11 +67,11 @@ const HeroSection = () => {
           >
             Web Accessibility <br />For Everyone
           </motion.h1>
-          
+         
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: settings.reducedMotion ? 0 : 0.6, delay: 0.4 }}
             style={{
               fontSize: '1.2rem',
               lineHeight: '1.6',
@@ -84,25 +80,34 @@ const HeroSection = () => {
               maxWidth: '600px'
             }}
           >
-            Empowering users of all abilities with intuitive tools that make the web accessible, 
+            Empowering users of all abilities with intuitive tools that make the web accessible,
             enjoyable, and barrier-free.
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
+            transition={{ duration: settings.reducedMotion ? 0 : 0.6, delay: 0.6 }}
             style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}
           >
-            <CTAButton text="Try Demo" href="#demo" />
-            <CTAButton text="Download" variant="outline" href="/download" />
+            <CTAButton 
+              text="Try Demo" 
+              href="#demo" 
+              ariaLabel="Try our accessibility demo"
+            />
+            <CTAButton 
+              text="Download" 
+              variant="outline" 
+              href="/download" 
+              ariaLabel="Download the extension"
+            />
           </motion.div>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: settings.reducedMotion ? 0 : 0.6, delay: 0.4 }}
           style={{
             flex: 1,
             minWidth: '300px',
@@ -121,7 +126,7 @@ const HeroSection = () => {
             }}
           />
           <motion.div
-            animate={{
+            animate={settings.reducedMotion ? {} : {
               rotate: [0, 5, -5, 0],
               y: [0, 10, -10, 0]
             }}
@@ -142,6 +147,7 @@ const HeroSection = () => {
               fontWeight: 'bold',
               zIndex: 2
             }}
+            aria-hidden="true"
           >
             Try Now!
           </motion.div>

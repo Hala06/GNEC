@@ -1,56 +1,67 @@
 import { motion } from 'framer-motion';
 import CTAButton from '../../../components/core/Buttons/CTAButton';
+import { useAccessibility } from '../../../contexts/AccessibilityContext';
 
 const features = [
   {
     title: "Smart Screen Reader",
     description: "Context-aware reading with adjustable speed and voice preferences",
-    icon: "🔊"
+    icon: "🔊",
+    ariaLabel: "Smart screen reader feature"
   },
   {
     title: "Focus Highlighting",
     description: "Visual indicators for interactive elements with customizable colors",
-    icon: "✨"
+    icon: "✨",
+    ariaLabel: "Focus highlighting feature"
   },
   {
     title: "Customizable Cursor",
     description: "High-visibility cursors in multiple shapes and sizes",
-    icon: "🖱️"
+    icon: "🖱️",
+    ariaLabel: "Customizable cursor feature"
   },
   {
     title: "Text Magnifier",
     description: "Hover-to-zoom for difficult-to-read text elements",
-    icon: "🔍"
+    icon: "🔍",
+    ariaLabel: "Text magnifier feature"
   },
   {
     title: "Voice Control",
     description: "Navigate hands-free with simple voice commands",
-    icon: "🎙️"
+    icon: "🎙️",
+    ariaLabel: "Voice control feature"
   },
   {
     title: "Dark/Light Mode",
     description: "Automatic theme switching based on system preferences",
-    icon: "🌓"
+    icon: "🌓",
+    ariaLabel: "Dark and light mode feature"
   }
 ];
 
 const Features = () => {
+  const { settings } = useAccessibility();
+
   return (
-    <motion.section 
+    <motion.section
       id="features"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-      transition={{ duration: 0.6 }}
+      transition={{ duration: settings.reducedMotion ? 0 : 0.6 }}
       style={{
         padding: '6rem 2rem',
         background: 'var(--background)',
         position: 'relative',
         overflow: 'hidden'
       }}
+      aria-labelledby="features-heading"
     >
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <motion.h2
+          id="features-heading"
           style={{
             fontSize: '2.5rem',
             marginBottom: '1rem',
@@ -62,7 +73,7 @@ const Features = () => {
         >
           Accessibility Features
         </motion.h2>
-        
+
         <motion.p
           style={{
             fontSize: '1.2rem',
@@ -88,8 +99,11 @@ const Features = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "0px 0px -50px 0px" }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ y: -5 }}
+              transition={{ 
+                duration: settings.reducedMotion ? 0 : 0.5, 
+                delay: index * 0.1 
+              }}
+              whileHover={settings.reducedMotion ? {} : { y: -5 }}
               style={{
                 padding: '2rem',
                 background: 'var(--secondary)',
@@ -97,6 +111,8 @@ const Features = () => {
                 border: '1px solid var(--border)',
                 boxShadow: '0 4px 20px rgba(var(--text-rgb), 0.05)'
               }}
+              aria-label={feature.ariaLabel}
+              tabIndex="0"
             >
               <div style={{
                 fontSize: '2rem',
@@ -130,7 +146,11 @@ const Features = () => {
         </div>
 
         <div style={{ textAlign: 'center' }}>
-          <CTAButton text="See All Features" href="/features" />
+          <CTAButton 
+            text="See All Features" 
+            href="/features" 
+            ariaLabel="View all accessibility features"
+          />
         </div>
       </div>
     </motion.section>

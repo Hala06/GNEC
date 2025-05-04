@@ -1,15 +1,31 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useAccessibility } from '/src/contexts/AccessibilityContext';
 
 const FocusBorder = () => {
+  const { settings } = useAccessibility();
   const [activeElement, setActiveElement] = useState(null);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0, x: 0, y: 0 });
+  const [dimensions, setDimensions] = useState({ 
+    width: 0, 
+    height: 0, 
+    x: 0, 
+    y: 0 
+  });
 
   useEffect(() => {
     const handleFocus = (e) => {
-      if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT') {
-        setActiveElement(e.target);
-        const rect = e.target.getBoundingClientRect();
+      const focusableElements = [
+        'BUTTON', 'A', 'INPUT', 'SELECT', 'TEXTAREA', 
+        '[role="button"]', '[role="link"]', '[tabindex]'
+      ];
+      
+      if (focusableElements.some(selector => 
+        e.target.matches(selector) || 
+        e.target.closest(selector)
+      )) {
+        const element = e.target.closest(focusableElements.join(',')) || e.target;
+        setActiveElement(element);
+        const rect = element.getBoundingClientRect();
         setDimensions({
           width: rect.width,
           height: rect.height,
@@ -43,11 +59,11 @@ const FocusBorder = () => {
       transition={{ type: 'spring', damping: 20, stiffness: 300 }}
       style={{
         position: 'fixed',
-        borderRadius: '8px',
-        border: '3px solid var(--focus-color, #FF5722)',
+        borderRadius: '6px',
+        border: `2px solid ${settings.highlight.color}`,
         pointerEvents: 'none',
         zIndex: 9998,
-        boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.8)'
+        boxShadow: `0 0 0 2px ${settings.highlight.color}20`
       }}
     />
   );

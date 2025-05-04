@@ -1,39 +1,44 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { ACCESSIBILITY_SETTINGS } from '../config/constants';
+import { ACCESSIBILITY_SETTINGS } from '/src/config/constants';
 
 const AccessibilityContext = createContext();
 
 export const AccessibilityProvider = ({ children }) => {
-  const [settings, setSettings] = useState({
-    cursor: {
-      size: 'medium',
-      color: ACCESSIBILITY_SETTINGS.CURSOR.COLORS[0],
-      shape: 'default'
-    },
-    highlight: {
-      color: ACCESSIBILITY_SETTINGS.HIGHLIGHT.COLORS[0],
-      style: 'solid'
-    },
-    speech: {
-      rate: 1.0,
-      pitch: 1.0,
-      voice: null
-    },
-    theme: ACCESSIBILITY_SETTINGS.THEMES.LIGHT,
-    isScreenReaderActive: false
+  const [settings, setSettings] = useState(() => {
+    // Initialize with default settings
+    const defaultSettings = {
+      cursor: {
+        size: 'medium',
+        color: ACCESSIBILITY_SETTINGS.CURSOR.COLORS[0],
+        shape: 'default'
+      },
+      highlight: {
+        color: ACCESSIBILITY_SETTINGS.HIGHLIGHT.COLORS[0],
+        style: 'solid'
+      },
+      speech: {
+        rate: 1.0,
+        pitch: 1.0,
+        voice: null
+      },
+      theme: ACCESSIBILITY_SETTINGS.THEMES.LIGHT,
+      isScreenReaderActive: false,
+      reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    };
+
+    // Try to load from localStorage
+    try {
+      const savedSettings = JSON.parse(localStorage.getItem('accessibilitySettings'));
+      return savedSettings ? { ...defaultSettings, ...savedSettings } : defaultSettings;
+    } catch {
+      return defaultSettings;
+    }
   });
 
-  // Load settings from localStorage
+  // Apply theme on mount and when it changes
   useEffect(() => {
-    const savedSettings = localStorage.getItem('accessibilitySettings');
-    if (savedSettings) {
-      try {
-        setSettings(JSON.parse(savedSettings));
-      } catch (e) {
-        console.error('Failed to parse saved settings', e);
-      }
-    }
-  }, []);
+    document.documentElement.setAttribute('data-theme', settings.theme);
+  }, [settings.theme]);
 
   // Save settings to localStorage when they change
   useEffect(() => {
@@ -43,18 +48,22 @@ export const AccessibilityProvider = ({ children }) => {
   // Initialize speech voices
   useEffect(() => {
     const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
+      const voices = window.speechSynthesis?.getVoices() || [];
       if (voices.length > 0 && !settings.speech.voice) {
         const defaultVoice = voices.find(v => v.default) || voices[0];
         updateSetting('speech', { ...settings.speech, voice: defaultVoice });
       }
     };
 
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
+    if (window.speechSynthesis) {
+      loadVoices();
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
 
     return () => {
-      window.speechSynthesis.onvoiceschanged = null;
+      if (window.speechSynthesis) {
+        window.speechSynthesis.onvoiceschanged = null;
+      }
     };
   }, [settings.speech]);
 
@@ -66,10 +75,16 @@ export const AccessibilityProvider = ({ children }) => {
   };
 
   const toggleScreenReader = () => {
+    const newValue = !settings.isScreenReaderActive;
     setSettings(prev => ({
       ...prev,
-      isScreenReaderActive: !prev.isScreenReaderActive
+      isScreenReaderActive: newValue
     }));
+    
+    // Stop any current speech when turning off
+    if (!newValue && window.speechSynthesis?.speaking) {
+      window.speechSynthesis.cancel();
+    }
   };
 
   const toggleTheme = () => {
@@ -78,7 +93,10 @@ export const AccessibilityProvider = ({ children }) => {
       : ACCESSIBILITY_SETTINGS.THEMES.LIGHT;
     
     updateSetting('theme', newTheme);
-    document.body.setAttribute('data-theme', newTheme);
+  };
+
+  const toggleReducedMotion = () => {
+    updateSetting('reducedMotion', !settings.reducedMotion);
   };
 
   return (
@@ -87,7 +105,8 @@ export const AccessibilityProvider = ({ children }) => {
         settings,
         updateSetting,
         toggleScreenReader,
-        toggleTheme
+        toggleTheme,
+        toggleReducedMotion
       }}
     >
       {children}

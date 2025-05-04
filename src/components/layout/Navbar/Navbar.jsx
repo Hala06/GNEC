@@ -2,44 +2,23 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import CTAButton from '../../core/Buttons/CTAButton';
-import SunIcon from '/assets/icons/sun.png';
-import MoonIcon from '/assets/icons/moon.png';
+import { useAccessibility } from '../../../contexts/AccessibilityContext';
 
 const Navbar = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { settings, toggleTheme, toggleScreenReader } = useAccessibility();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Initialize theme and scroll effects
   useEffect(() => {
-    // Check system preference and localStorage
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const savedMode = localStorage.getItem('theme');
-    const initialMode = savedMode ? savedMode === 'dark' : prefersDark;
-    
-    setIsDarkMode(initialMode);
-    document.body.setAttribute('data-theme', initialMode ? 'dark' : 'light');
-
-    // Scroll effect
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Toggle theme handler
-  const toggleTheme = () => {
-    const newMode = !isDarkMode;
-    setIsDarkMode(newMode);
-    document.body.setAttribute('data-theme', newMode ? 'dark' : 'light');
-    localStorage.setItem('theme', newMode ? 'dark' : 'light');
-  };
-
-  // Nav links data
   const navLinks = [
     { name: 'Features', path: '#features' },
     { name: 'Demo', path: '#demo' },
-    { name: 'About', path: '#about' },
-    { name: 'Docs', path: '/docs' }
+    { name: 'About', path: '#about' }
   ];
 
   return (
@@ -57,8 +36,8 @@ const Navbar = () => {
         justifyContent: 'space-between',
         alignItems: 'center',
         zIndex: 9999,
-        background: scrolled 
-          ? `rgba(${isDarkMode ? '21, 21, 40' : '245, 247, 249'}, ${isDarkMode ? 0.95 : 0.97})`
+        background: scrolled
+          ? `rgba(var(--background-rgb), 0.95)`
           : 'transparent',
         backdropFilter: 'blur(10px)',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -66,13 +45,9 @@ const Navbar = () => {
       }}
     >
       {/* Logo */}
-      <Link 
-        to="/" 
-        style={{ textDecoration: 'none' }}
-        aria-label="Home"
-      >
+      <Link to="/" style={{ textDecoration: 'none' }} aria-label="Home">
         <motion.div
-          whileHover={{ scale: 1.05 }}
+          whileHover={settings.reducedMotion ? {} : { scale: 1.05 }}
           style={{
             fontSize: '1.8rem',
             fontWeight: 'bold',
@@ -86,13 +61,17 @@ const Navbar = () => {
       </Link>
 
       {/* Desktop Navigation */}
-      <div className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+      <div className="desktop-nav" style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '2rem' 
+      }}>
         <div style={{ display: 'flex', gap: '1.5rem' }}>
           {navLinks.map((link, index) => (
             <motion.a
               key={index}
               href={link.path}
-              whileHover={{ y: -2 }}
+              whileHover={settings.reducedMotion ? {} : { y: -2 }}
               whileTap={{ scale: 0.95 }}
               style={{
                 color: 'var(--text)',
@@ -109,69 +88,85 @@ const Navbar = () => {
           ))}
         </div>
 
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div style={{ 
+          display: 'flex', 
+          gap: '1rem', 
+          alignItems: 'center' 
+        }}>
+          <button
+            onClick={toggleScreenReader}
+            aria-label={`Screen reader ${settings.isScreenReaderActive ? 'on' : 'off'}`}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: '0.5rem',
+              cursor: 'pointer',
+              color: settings.isScreenReaderActive ? 'var(--accent)' : 'var(--text)'
+            }}
+          >
+            {settings.isScreenReaderActive ? '🔊' : '🔇'}
+          </button>
+
+          <button
+            onClick={toggleTheme}
+            aria-label={`Toggle ${settings.theme === 'dark' ? 'light' : 'dark'} mode`}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: '0.5rem',
+              cursor: 'pointer',
+              color: 'var(--text)'
+            }}
+          >
+            {settings.theme === 'light' ? '🌙' : '☀️'}
+          </button>
+
           <CTAButton 
             text="Download" 
-            variant="outline" 
-            href="/download" 
-            style={{ padding: '0.75rem 1.5rem' }}
+            variant="outline"
+            href="/download"
           />
-          
-          {/* Theme Toggle */}
-          <motion.button
-            onClick={toggleTheme}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            style={{
-              background: 'var(--secondary)',
-              border: 'none',
-              padding: '0.8rem',
-              borderRadius: '50%',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-            aria-label={`Toggle ${isDarkMode ? 'Light' : 'Dark'} Mode`}
-          >
-            <motion.img
-              src={isDarkMode ? SunIcon : MoonIcon}
-              alt=""
-              style={{ width: '24px', height: '24px' }}
-              animate={{ rotate: isDarkMode ? 360 : 0 }}
-              transition={{ duration: 0.5 }}
-            />
-          </motion.button>
         </div>
       </div>
 
       {/* Mobile Navigation */}
-      <div className="mobile-nav" style={{ display: 'none' }}>
-        <button 
+      <div className="mobile-nav" style={{ 
+        display: 'none',
+        position: 'relative'
+      }}>
+        <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle menu"
+          aria-expanded={mobileMenuOpen}
           style={{
             background: 'none',
             border: 'none',
             color: 'var(--text)',
-            fontSize: '1.5rem'
+            fontSize: '1.5rem',
+            padding: '0.5rem'
           }}
         >
-          ☰
+          {mobileMenuOpen ? '✕' : '☰'}
         </button>
 
         {mobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
             style={{
               position: 'absolute',
               top: '100%',
-              left: 0,
               right: 0,
               background: 'var(--background)',
               padding: '1rem',
-              boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)'
+              borderRadius: '8px',
+              boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)',
+              minWidth: '200px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.5rem'
             }}
           >
             {navLinks.map((link, index) => (
@@ -180,19 +175,55 @@ const Navbar = () => {
                 href={link.path}
                 style={{
                   display: 'block',
-                  padding: '1rem',
+                  padding: '0.75rem 1rem',
                   color: 'var(--text)',
-                  textDecoration: 'none'
+                  textDecoration: 'none',
+                  borderRadius: '4px',
+                  transition: 'background 0.2s ease'
                 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => setMobileMenuOpen(false)}
               >
                 {link.name}
               </motion.a>
             ))}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              padding: '0.75rem 1rem',
+              borderTop: '1px solid var(--border)',
+              marginTop: '0.5rem'
+            }}>
+              <button
+                onClick={toggleScreenReader}
+                aria-label={`Screen reader ${settings.isScreenReaderActive ? 'on' : 'off'}`}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '0.5rem',
+                  cursor: 'pointer',
+                  color: settings.isScreenReaderActive ? 'var(--accent)' : 'var(--text)'
+                }}
+              >
+                {settings.isScreenReaderActive ? '🔊' : '🔇'}
+              </button>
+              <button
+                onClick={toggleTheme}
+                aria-label={`Toggle ${settings.theme === 'dark' ? 'light' : 'dark'} mode`}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '0.5rem',
+                  cursor: 'pointer',
+                  color: 'var(--text)'
+                }}
+              >
+                  {settings.theme === 'light' ? '🌙' : '☀️'}
+              </button>
+            </div>
           </motion.div>
         )}
       </div>
-
     </motion.nav>
   );
 };

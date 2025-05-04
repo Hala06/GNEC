@@ -1,11 +1,14 @@
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { useEffect } from 'react';
+import { useAccessibility } from '/src/contexts/AccessibilityContext';
 
-const Star = ({ x, y, size, delay, mouseX, mouseY }) => {
+const Star = ({ x, y, size, delay, mouseX, mouseY, reducedMotion }) => {
   const distance = useMotionValue(0);
-  const scale = useTransform(distance, [0, 0.5], [1, 1.5]);
+  const scale = useTransform(distance, [0, 0.5], [1, reducedMotion ? 1 : 1.5]);
 
   useEffect(() => {
+    if (reducedMotion) return;
+
     const handleMouseMove = (e) => {
       const starX = x * window.innerWidth / 100;
       const starY = y * window.innerHeight / 100;
@@ -15,7 +18,7 @@ const Star = ({ x, y, size, delay, mouseX, mouseY }) => {
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [x, y, distance]);
+  }, [x, y, distance, reducedMotion]);
 
   return (
     <motion.div
@@ -30,22 +33,24 @@ const Star = ({ x, y, size, delay, mouseX, mouseY }) => {
         scale,
         opacity: 0.8
       }}
-      animate={{
+      animate={reducedMotion ? {} : {
         opacity: [0.2, 0.8, 0.2],
         scale: [0.8, 1.2, 0.8]
       }}
       transition={{
-        duration: 3 + Math.random() * 2,
+        duration: reducedMotion ? 0 : 3 + Math.random() * 2,
         delay,
         repeat: Infinity,
         ease: "easeInOut"
       }}
+      aria-hidden="true"
     />
   );
 };
 
 const Stars = () => {
-  const stars = Array.from({ length: 40 }, (_, i) => ({
+  const { settings } = useAccessibility();
+  const stars = Array.from({ length: settings.reducedMotion ? 10 : 40 }, (_, i) => ({
     x: Math.random() * 100,
     y: Math.random() * 100,
     size: Math.random() * 3 + 1,
@@ -64,7 +69,11 @@ const Stars = () => {
       color: 'var(--star-color)'
     }}>
       {stars.map((star, i) => (
-        <Star key={i} {...star} />
+        <Star 
+          key={i} 
+          {...star} 
+          reducedMotion={settings.reducedMotion} 
+        />
       ))}
     </div>
   );

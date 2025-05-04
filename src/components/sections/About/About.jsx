@@ -1,14 +1,20 @@
 import { motion } from 'framer-motion';
 import CTAButton from '../../../components/core/Buttons/CTAButton';
+import { useAccessibility } from '../../../contexts/AccessibilityContext';
 
 const About = () => {
+  const { settings } = useAccessibility();
+
   return (
-    <motion.section 
+    <motion.section
       id="about"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
+      transition={{ 
+        duration: settings.reducedMotion ? 0 : 0.6, 
+        ease: 'easeOut' 
+      }}
       style={{
         padding: '6rem 2rem',
         textAlign: 'center',
@@ -34,7 +40,10 @@ const About = () => {
         About GNEC
       </motion.h2>
 
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+      <div style={{ 
+        maxWidth: '800px', 
+        margin: '0 auto' 
+      }}>
         <motion.p
           style={{
             fontSize: '1.2rem',
@@ -46,10 +55,10 @@ const About = () => {
             background: 'var(--secondary)',
             borderRadius: '16px'
           }}
-          whileHover={{ y: -5 }}
+          whileHover={settings.reducedMotion ? {} : { y: -5 }}
         >
-          GNEC is revolutionizing web accessibility by creating intuitive tools that make 
-          browsing seamless for users of all abilities. Our mission is to break down 
+          GNEC is revolutionizing web accessibility by creating intuitive tools that make
+          browsing seamless for users of all abilities. Our mission is to break down
           digital barriers through innovative solutions.
         </motion.p>
 
@@ -61,8 +70,16 @@ const About = () => {
             flexWrap: 'wrap'
           }}
         >
-          <CTAButton text="Meet the Team" variant="secondary" />
-          <CTAButton text="View Timeline" variant="outline" />
+          <CTAButton 
+            text="Meet the Team" 
+            variant="secondary" 
+            ariaLabel="Learn more about our team"
+          />
+          <CTAButton 
+            text="View Timeline" 
+            variant="outline" 
+            ariaLabel="View our development timeline"
+          />
         </motion.div>
 
         <motion.p
@@ -73,7 +90,7 @@ const About = () => {
             color: 'var(--text)'
           }}
         >
-          Built with ❤️ at the GNEC Hackathon 2025
+          Built with <span aria-label="love">❤️</span> at the GNEC Hackathon 2025
         </motion.p>
       </div>
     </motion.section>

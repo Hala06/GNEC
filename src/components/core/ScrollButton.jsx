@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAccessibility } from '/src/contexts/AccessibilityContext';
 
-const ScrollButton = () => {
+const ScrollButton = ({ containerRef }) => {
+  const { settings } = useAccessibility();
   const [visible, setVisible] = useState(false);
   const [direction, setDirection] = useState('up');
   const [lastScroll, setLastScroll] = useState(0);
@@ -10,7 +12,10 @@ const ScrollButton = () => {
     const handleScroll = () => {
       const currentScroll = window.scrollY;
       setDirection(currentScroll > lastScroll ? 'down' : 'up');
-      setVisible(currentScroll > 300 && currentScroll < document.body.scrollHeight - window.innerHeight - 100);
+      setVisible(
+        currentScroll > 300 && 
+        currentScroll < document.body.scrollHeight - window.innerHeight - 100
+      );
       setLastScroll(currentScroll);
     };
 
@@ -21,7 +26,7 @@ const ScrollButton = () => {
   const scrollTo = () => {
     window.scrollTo({
       top: direction === 'up' ? 0 : document.body.scrollHeight,
-      behavior: 'smooth'
+      behavior: settings.reducedMotion ? 'auto' : 'smooth'
     });
   };
 
@@ -32,9 +37,13 @@ const ScrollButton = () => {
           key="scroll-button"
           onClick={scrollTo}
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={{ 
+            opacity: 1, 
+            y: 0,
+            transition: { duration: settings.reducedMotion ? 0 : 0.3 }
+          }}
           exit={{ opacity: 0, y: 20 }}
-          whileHover={{ scale: 1.1 }}
+          whileHover={{ scale: settings.reducedMotion ? 1 : 1.1 }}
           whileTap={{ scale: 0.9 }}
           className="scroll-to-button"
           aria-label={direction === 'up' ? 'Scroll to top' : 'Scroll to bottom'}

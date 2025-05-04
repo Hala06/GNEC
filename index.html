@@ -5,11 +5,6 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <!-- Preload critical assets -->
-    <link rel="preload" href="/src/assets/elderly.jpg" as="image" />
-    <link rel="preload" href="/src/assets/moon.png" as="image" />
-    <link rel="preload" href="/src/assets/sun.png" as="image" />
-    
     <!-- Preload fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,9 +12,10 @@
     <!-- Prevent Flash of Unstyled Content -->
     <script>
       // Preserve the user's theme preference
-      const theme = localStorage.getItem('dark-mode');
-      if (theme) {
-        document.documentElement.setAttribute('data-theme', JSON.parse(theme) ? 'dark' : 'light');
+      const savedSettings = localStorage.getItem('accessibilitySettings');
+      if (savedSettings) {
+        const settings = JSON.parse(savedSettings);
+        document.documentElement.setAttribute('data-theme', settings.theme || 'light');
       }
     </script>
     
@@ -29,14 +25,10 @@
         margin: 0;
         padding: 0;
         min-height: 100vh;
-        background-color: #ffffff;
-      }
-      [data-theme="dark"] {
-        background-color: #1a202c;
       }
     </style>
   </head>
-  <body style="background-color: #ffffff">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

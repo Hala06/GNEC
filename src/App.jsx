@@ -26,27 +26,40 @@ import ScreenReader from './components/accessibility/ScreenReader';
 function App() {
   const appRef = useRef();
 
-  // Initialize theme
+  // Initialize theme and accessibility features
   useEffect(() => {
     initTheme();
+    
+    // Add skip link target
+    if (!document.getElementById('main-content')) {
+      const main = document.createElement('main');
+      main.id = 'main-content';
+      main.tabIndex = -1;
+      document.body.appendChild(main);
+    }
   }, []);
 
   return (
     <AccessibilityProvider>
       <div className="app-container" ref={appRef}>
+        {/* Skip link for keyboard users */}
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
+
         {/* Visual Effects */}
         <BackgroundBlobs />
         <Stars />
-        
+
         {/* Accessibility Features */}
         <CursorHighlighter />
         <FocusBorder />
         <ScreenReader />
-        
+       
         {/* Main Layout */}
         <Navbar />
-        
-        <main className="content-wrapper">
+       
+        <main id="main-content" className="content-wrapper">
           <HeroSection />
           <SectionDivider variant={1} />
           <Features />
@@ -54,9 +67,9 @@ function App() {
           <TextToSpeechDemo />
           <SectionDivider variant={3} />
           <About />
-          <Footer />
         </main>
-        
+       
+        <Footer />
         <ScrollButton containerRef={appRef} />
       </div>
     </AccessibilityProvider>

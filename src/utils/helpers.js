@@ -1,35 +1,32 @@
-// Sets the theme and saves to localStorage
+// Theme helpers
 export const setTheme = (theme) => {
-  document.body.setAttribute('data-theme', theme);
+  document.documentElement.setAttribute('data-theme', theme);
   localStorage.setItem('theme', theme);
 };
 
-// Gets the current theme from localStorage or system preference
 export const getPreferredTheme = () => {
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme) return savedTheme;
 
-  return window.matchMedia('(prefers-color-scheme: dark)').matches 
-    ? 'dark' 
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark'
     : 'light';
 };
 
-// Toggles between light and dark theme
 export const toggleTheme = () => {
-  const currentTheme = document.body.getAttribute('data-theme') || 'light';
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
   const newTheme = currentTheme === 'light' ? 'dark' : 'light';
   setTheme(newTheme);
   return newTheme;
 };
 
-// Initializes theme based on user preference
 export const initTheme = () => {
   const theme = getPreferredTheme();
   setTheme(theme);
   return theme;
 };
 
-// Debounce function for performance optimization
+// Performance helpers
 export const debounce = (func, wait = 100) => {
   let timeout;
   return (...args) => {
@@ -38,7 +35,6 @@ export const debounce = (func, wait = 100) => {
   };
 };
 
-// Throttle function for scroll/resize events
 export const throttle = (func, limit = 100) => {
   let lastFunc;
   let lastRan;
@@ -60,12 +56,11 @@ export const throttle = (func, limit = 100) => {
   };
 };
 
-// Generates unique ID
+// DOM helpers
 export const generateId = (prefix = 'id') => {
   return `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
 };
 
-// Checks if element is in viewport
 export const isInViewport = (element) => {
   const rect = element.getBoundingClientRect();
   return (
@@ -76,7 +71,6 @@ export const isInViewport = (element) => {
   );
 };
 
-// Smooth scroll to element
 export const smoothScrollTo = (element, offset = 80) => {
   window.scrollTo({
     behavior: 'smooth',
@@ -84,23 +78,57 @@ export const smoothScrollTo = (element, offset = 80) => {
   });
 };
 
-// ARIA live region helper
+// Accessibility helpers
 export const announce = (message, politeness = 'polite') => {
   const liveRegion = document.getElementById('a11y-live-region') || createLiveRegion();
   liveRegion.setAttribute('aria-live', politeness);
-  liveRegion.textContent = message;
   
+  // Clear previous message
+  liveRegion.textContent = '';
+  
+  // Force a reflow to ensure screen readers announce the new message
+  void liveRegion.offsetWidth;
+  
+  liveRegion.textContent = message;
+
   // Clear message after a delay
   setTimeout(() => {
     liveRegion.textContent = '';
   }, 5000);
 };
 
-// Create ARIA live region if it doesn't exist
 const createLiveRegion = () => {
   const region = document.createElement('div');
   region.id = 'a11y-live-region';
   region.className = 'sr-only';
+  region.setAttribute('aria-atomic', 'true');
   document.body.appendChild(region);
   return region;
+};
+
+export const trapFocus = (element) => {
+  const focusableElements = element.querySelectorAll(
+    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+  );
+  const firstElement = focusableElements[0];
+  const lastElement = focusableElements[focusableElements.length - 1];
+
+  const handleTab = (e) => {
+    if (e.key === 'Tab') {
+      if (e.shiftKey && document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement.focus();
+      } else if (!e.shiftKey && document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement.focus();
+      }
+    }
+  };
+
+  firstElement.focus();
+  element.addEventListener('keydown', handleTab);
+
+  return () => {
+    element.removeEventListener('keydown', handleTab);
+  };
 };

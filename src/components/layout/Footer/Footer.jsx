@@ -1,13 +1,17 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useAccessibility } from '/src/contexts/AccessibilityContext';
 
 const Footer = () => {
+  const { settings } = useAccessibility();
   const currentYear = new Date().getFullYear();
+  
   const links = [
     { name: 'Privacy', path: '/privacy' },
     { name: 'Terms', path: '/terms' },
     { name: 'GitHub', path: 'https://github.com/ket3l4/Listen-Up', external: true },
-    { name: 'Contact', path: '/contact' }
+    { name: 'Contact', path: '/contact' },
+    { name: 'Accessibility', path: '/accessibility' }
   ];
 
   return (
@@ -17,9 +21,8 @@ const Footer = () => {
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
       style={{
-        background: 'var(--gradient-primary)',
+        background: 'var(--secondary)',
         padding: '3rem 2rem',
-        textAlign: 'center',
         color: 'var(--text)',
         borderTop: '1px solid var(--border)',
         marginTop: '4rem'
@@ -40,7 +43,7 @@ const Footer = () => {
           gap: '1.5rem'
         }}>
           <motion.div
-            whileHover={{ scale: 1.05 }}
+            whileHover={settings.reducedMotion ? {} : { scale: 1.05 }}
             style={{
               fontSize: '1.8rem',
               fontWeight: 'bold',
@@ -52,7 +55,7 @@ const Footer = () => {
             GNEC
           </motion.div>
 
-          <nav style={{
+          <nav aria-label="Footer navigation" style={{
             display: 'flex',
             gap: '1.5rem',
             flexWrap: 'wrap',
@@ -61,7 +64,7 @@ const Footer = () => {
             {links.map((link, index) => (
               <motion.div
                 key={index}
-                whileHover={{ y: -2 }}
+                whileHover={settings.reducedMotion ? {} : { y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
                 {link.external ? (
@@ -76,6 +79,7 @@ const Footer = () => {
                       opacity: 0.8,
                       transition: 'all 0.3s ease'
                     }}
+                    aria-label={`${link.name} (opens in new tab)`}
                   >
                     {link.name}
                   </a>
@@ -103,13 +107,17 @@ const Footer = () => {
           flexDirection: 'column',
           gap: '1rem',
           opacity: 0.7,
-          fontSize: '0.9rem'
+          fontSize: '0.9rem',
+          textAlign: 'center'
         }}>
           <p style={{ margin: 0 }}>
             © {currentYear} GNEC. All rights reserved.
           </p>
           <p style={{ margin: 0 }}>
-            Made with ❤️ for the GNEC Hackathon 2025
+            Made with <span aria-label="love">❤️</span> for the GNEC Hackathon 2025
+          </p>
+          <p style={{ margin: 0, fontSize: '0.8rem' }}>
+            Accessibility Mode: {settings.isScreenReaderActive ? 'On' : 'Off'}
           </p>
         </div>
       </div>

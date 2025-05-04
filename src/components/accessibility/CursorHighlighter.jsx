@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useAccessibility } from '/src/contexts/AccessibilityContext';
 
 const CursorHighlighter = () => {
+  const { settings } = useAccessibility();
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [clicked, setClicked] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -29,26 +31,33 @@ const CursorHighlighter = () => {
     };
   }, []);
 
+  const cursorSize = {
+    small: 30,
+    medium: 40,
+    large: 50
+  }[settings.cursor.size];
+
   return (
     <motion.div
       className="cursor-highlighter"
       animate={{
-        x: position.x - 20,
-        y: position.y - 20,
-        scale: clicked ? 0.8 : 1,
+        x: position.x - cursorSize / 2,
+        y: position.y - cursorSize / 2,
+        scale: clicked ? 0.9 : 1,
         opacity: visible ? 1 : 0
       }}
       transition={{ type: 'spring', damping: 20, stiffness: 300 }}
       style={{
         position: 'fixed',
-        width: '40px',
-        height: '40px',
-        borderRadius: '50%',
-        backgroundColor: 'var(--cursor-color, rgba(74, 144, 168, 0.3))',
-        border: '2px solid var(--cursor-border, #4A90A8)',
+        width: `${cursorSize}px`,
+        height: `${cursorSize}px`,
+        borderRadius: settings.cursor.shape === 'circle' ? '50%' : '4px',
+        backgroundColor: 'transparent',
+        border: `2px solid ${settings.cursor.color}`,
         pointerEvents: 'none',
         zIndex: 9999,
-        mixBlendMode: 'difference'
+        mixBlendMode: 'difference',
+        transformOrigin: 'center'
       }}
     />
   );

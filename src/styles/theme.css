@@ -1,44 +1,73 @@
-/* src/styles/theme.css */
 :root {
-    /* Light Theme Variables */
-    --background: #F5F7F9;
-    --text: #1a202c;
-    --accent: #4A90A8;
-    --secondary: #E7EEF0;
-    --border: #88B5C1;
-    --hover: #3A7A8F;
-    
-    /* Blob Colors */
-    --blob-1: rgba(100, 149, 237, 0.15);
-    --blob-2: rgba(147, 112, 219, 0.15);
-    --blob-3: rgba(72, 209, 204, 0.15);
-    
-    /* Stars */
-    --star-color: rgba(255, 255, 255, 0.7);
-    
-    /* RGB versions for calculations */
-    --text-rgb: 26, 32, 44;
-    --accent-rgb: 74, 144, 168;
-  }
-  
-  [data-theme="dark"] {
-    /* Dark Theme Variables */
-    --background: #151528;
-    --text: #E9E9F0;
-    --accent: #8B85D8;
-    --secondary: #252540;
-    --border: #353550;
-    --hover: #A5A1E5;
-    
-    /* Blob Colors */
-    --blob-1: rgba(72, 61, 139, 0.15);
-    --blob-2: rgba(75, 0, 130, 0.15);
-    --blob-3: rgba(106, 90, 205, 0.15);
-    
-    /* Stars */
-    --star-color: rgba(255, 255, 255, 0.9);
-    
-    /* RGB versions */
-    --text-rgb: 233, 233, 240;
-    --accent-rgb: 139, 135, 179;
-  }
+  /* Base colors */
+  --accent: #4A90A8;
+  --accent-rgb: 74, 144, 168;
+  --hover: #3A7A8F;
+  --text: #1a202c;
+  --text-rgb: 26, 32, 44;
+  --background: #F5F7F9;
+  --secondary: #E7EEF0;
+  --border: #88B5C1;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #5CA4B3, #E2E9EB);
+  --gradient-secondary: linear-gradient(135deg, #4A90A8, #3A7A8F);
+  --gradient-accent: linear-gradient(45deg, #88B5C1, #4A90A8);
+
+  /* Text contrasts */
+  --text-primary: var(--text);
+  --text-secondary: rgba(26, 32, 44, 0.8);
+  --text-tertiary: rgba(26, 32, 44, 0.6);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+  --accent: #8B85D8;
+  --accent-rgb: 139, 135, 216;
+  --hover: #A5A1E5;
+  --text: #E9E9F0;
+  --text-rgb: 233, 233, 240;
+  --background: #151528;
+  --secondary: #252540;
+  --border: #353550;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #202040, #7B779F);
+  --gradient-secondary: linear-gradient(135deg, #8B85D8, #7B779F);
+  --gradient-accent: linear-gradient(45deg, #353550, #8B85D8);
+
+  /* Text contrasts */
+  --text-primary: var(--text);
+  --text-secondary: rgba(233, 233, 240, 0.8);
+  --text-tertiary: rgba(233, 233, 240, 0.6);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Ensure theme transitions are smooth */
+*, *::before, *::after {
+  transition: 
+    background 0.3s ease,
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* Apply background gradient to root elements */
+html {
+  background: var(--gradient-primary);
+}
+
+/* Base theme styles */
+body {
+  color: var(--text);
+  background: transparent;
+}

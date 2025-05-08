@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { ACCESSIBILITY_SETTINGS } from '/src/config/constants';
+import { ACCESSIBILITY_SETTINGS } from '../config/constants';
 
 const AccessibilityContext = createContext();
 
@@ -17,12 +17,12 @@ export const AccessibilityProvider = ({ children }) => {
         style: 'solid'
       },
       speech: {
-        rate: 1.0,
+        rate: 0.8, // Default to 0.8
         pitch: 1.0,
         voice: null
       },
-      theme: window.matchMedia('(prefers-color-scheme: dark)').matches 
-        ? ACCESSIBILITY_SETTINGS.THEMES.DARK 
+      theme: window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? ACCESSIBILITY_SETTINGS.THEMES.DARK
         : ACCESSIBILITY_SETTINGS.THEMES.LIGHT,
       isScreenReaderActive: false,
       reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -52,8 +52,15 @@ export const AccessibilityProvider = ({ children }) => {
     const loadVoices = () => {
       const voices = window.speechSynthesis?.getVoices() || [];
       if (voices.length > 0 && !settings.speech.voice) {
-        const defaultVoice = voices.find(v => v.default) || voices[0];
-        updateSetting('speech', { ...settings.speech, voice: defaultVoice });
+        const defaultVoice = voices.find(v => 
+          v.lang.includes('en-') && v.name.toLowerCase().includes('male')
+        ) || voices.find(v => v.default) || voices[0];
+        
+        updateSetting('speech', { 
+          ...settings.speech, 
+          voice: defaultVoice,
+          rate: 0.8
+        });
       }
     };
 
@@ -82,7 +89,7 @@ export const AccessibilityProvider = ({ children }) => {
       ...prev,
       isScreenReaderActive: newValue
     }));
-    
+   
     // Stop any current speech when turning off
     if (!newValue && window.speechSynthesis?.speaking) {
       window.speechSynthesis.cancel();
@@ -94,6 +101,9 @@ export const AccessibilityProvider = ({ children }) => {
     const newTheme = currentTheme === ACCESSIBILITY_SETTINGS.THEMES.LIGHT
       ? ACCESSIBILITY_SETTINGS.THEMES.DARK
       : ACCESSIBILITY_SETTINGS.THEMES.LIGHT;
+    
+    // Force theme change immediately
+    document.documentElement.setAttribute('data-theme', newTheme);
     
     setSettings(prev => ({
       ...prev,

@@ -4,11 +4,17 @@ import { useAccessibility } from '/src/contexts/AccessibilityContext';
 const BackgroundBlobs = () => {
   const { settings } = useAccessibility();
  
-  const colors = [
-    'rgba(168, 216, 185, 0.15)', // Mint
-    'rgba(255, 182, 193, 0.15)', // Pink
-    'rgba(139, 135, 216, 0.15)'  // Purple
-  ];
+  const colors = settings.theme === 'dark' 
+    ? [
+        'rgba(168, 216, 185, 0.15)', // Mint
+        'rgba(255, 182, 193, 0.15)', // Pink
+        'rgba(139, 135, 216, 0.15)'  // Purple
+      ]
+    : [
+        'rgba(255, 223, 186, 0.2)',  // Light peach
+        'rgba(221, 214, 255, 0.2)',  // Lavender
+        'rgba(204, 255, 230, 0.2)'   // Mint
+      ];
 
   const blobVariants = {
     animate: (i) => ({

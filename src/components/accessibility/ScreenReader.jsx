@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useAccessibility } from '/src/contexts/AccessibilityContext';
+import { useAccessibility } from '../../contexts/AccessibilityContext';
 
 const ScreenReader = () => {
   const { settings, updateSetting } = useAccessibility();
@@ -26,8 +26,7 @@ const ScreenReader = () => {
       if (text) {
         setActiveText(text);
         highlightElement(element);
-        
-        // Show help tooltip for interactive elements
+       
         if (element.closest('button, a, [role="button"], [tabindex]')) {
           setShowHelp(true);
           clearTimeout(helpTimeoutRef.current);
@@ -81,8 +80,15 @@ const ScreenReader = () => {
   };
 
   const toggleScreenReader = () => {
-    updateSetting('isScreenReaderActive', !settings.isScreenReaderActive);
-    if (isReading) {
+    const newValue = !settings.isScreenReaderActive;
+    updateSetting('isScreenReaderActive', newValue);
+    
+    // Provide auditory feedback
+    if (newValue) {
+      const feedback = new SpeechSynthesisUtterance("Screen reader activated");
+      feedback.voice = settings.speech.voice;
+      synthRef.current.speak(feedback);
+    } else {
       synthRef.current?.cancel();
     }
   };
@@ -137,7 +143,8 @@ const ScreenReader = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+          boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+          transition: 'all 0.3s ease'
         }}
       >
         {settings.isScreenReaderActive ? '🔊' : '🔇'}
@@ -160,7 +167,8 @@ const ScreenReader = () => {
             alignItems: 'center',
             gap: '8px',
             boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-            opacity: activeText ? 1 : 0.6
+            opacity: activeText ? 1 : 0.6,
+            transition: 'all 0.3s ease'
           }}
         >
           {isReading ? '⏹ Stop' : '▶ Read'}

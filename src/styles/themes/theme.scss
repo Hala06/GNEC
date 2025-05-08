@@ -1,18 +1,21 @@
 :root {
   /* Base colors */
-  --accent: #4A90A8;
-  --accent-rgb: 74, 144, 168;
-  --hover: #3A7A8F;
+  --accent: #FF7E5F;  // Warm coral
+  --accent-rgb: 255, 126, 95;
+  --hover: #FF9E7D;
   --text: #1a202c;
   --text-rgb: 26, 32, 44;
   --background: #F5F7F9;
   --secondary: #E7EEF0;
   --border: #88B5C1;
+  --error: #FF6B6B;
+  --success: #6BCB77;
+  --warning: #FFD166;
 
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, #5CA4B3, #E2E9EB);
-  --gradient-secondary: linear-gradient(135deg, #4A90A8, #3A7A8F);
-  --gradient-accent: linear-gradient(45deg, #88B5C1, #4A90A8);
+  --gradient-secondary: linear-gradient(135deg, #FF7E5F, #FF9E7D);
+  --gradient-accent: linear-gradient(45deg, #88B5C1, #FF7E5F);
 
   /* Text contrasts */
   --text-primary: var(--text);
@@ -26,9 +29,9 @@
 }
 
 [data-theme="dark"] {
-  --accent: #8B85D8;
-  --accent-rgb: 139, 135, 216;
-  --hover: #A5A1E5;
+  --accent: #FF7E5F;  // Keep the same accent color for consistency
+  --accent-rgb: 255, 126, 95;
+  --hover: #FF9E7D;
   --text: #E9E9F0;
   --text-rgb: 233, 233, 240;
   --background: #151528;
@@ -37,8 +40,8 @@
 
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, #202040, #7B779F);
-  --gradient-secondary: linear-gradient(135deg, #8B85D8, #7B779F);
-  --gradient-accent: linear-gradient(45deg, #353550, #8B85D8);
+  --gradient-secondary: linear-gradient(135deg, #FF7E5F, #FF9E7D);
+  --gradient-accent: linear-gradient(45deg, #353550, #FF7E5F);
 
   /* Text contrasts */
   --text-primary: var(--text);
@@ -53,7 +56,7 @@
 
 /* Ensure theme transitions are smooth */
 *, *::before, *::after {
-  transition: 
+  transition:
     background 0.3s ease,
     background-color 0.3s ease,
     border-color 0.3s ease,

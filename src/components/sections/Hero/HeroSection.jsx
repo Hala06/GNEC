@@ -1,8 +1,9 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
-import elderlyImage from '/assets/images/elderly.jpg';
 import CTAButton from '../../../components/core/Buttons/CTAButton';
 import { useAccessibility } from '../../../contexts/AccessibilityContext';
+import elderlyImage from '/assets/images/elderly.jpg';
+import beforeAfterImage from '/assets/images/B-A.jpg';
 
 const HeroSection = () => {
   const { settings } = useAccessibility();
@@ -30,7 +31,6 @@ const HeroSection = () => {
       }}
       aria-labelledby="hero-heading"
     >
-
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -90,16 +90,21 @@ const HeroSection = () => {
             transition={{ duration: settings.reducedMotion ? 0 : 0.6, delay: 0.6 }}
             style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}
           >
-            <CTAButton 
-              text="Try Demo" 
-              href="#demo" 
+            <CTAButton
+              text="Try Demo"
+              onClick={() => {
+                const demoSection = document.querySelector('#demo');
+                if (demoSection) {
+                  demoSection.scrollIntoView({ behavior: settings.reducedMotion ? 'auto' : 'smooth' });
+                }
+              }}
               ariaLabel="Try our accessibility demo"
             />
-            <CTAButton 
-              text="Download" 
-              variant="outline" 
-              href="/download" 
-              ariaLabel="Download the extension"
+            <CTAButton
+              text="Get Extension"
+              variant="outline"
+              onClick={() => window.open('https://github.com/ket3l4/AccessEd', '_blank')}
+              ariaLabel="Get the AccessEd browser extension"
             />
           </motion.div>
         </motion.div>
@@ -111,7 +116,10 @@ const HeroSection = () => {
           style={{
             flex: 1,
             minWidth: '300px',
-            position: 'relative'
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.5rem'
           }}
         >
           <img
@@ -122,7 +130,21 @@ const HeroSection = () => {
               maxWidth: '500px',
               borderRadius: '24px',
               boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
-              border: '2px solid var(--border)'
+              border: '2px solid var(--border)',
+              zIndex: 2
+            }}
+          />
+          <img
+            src={beforeAfterImage}
+            alt="Before/After using AccessEd showing accessibility improvements"
+            style={{
+              width: '80%',
+              borderRadius: '16px',
+              boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)',
+              border: '2px solid var(--border)',
+              marginLeft: 'auto',
+              marginTop: '-60px',
+              zIndex: 1
             }}
           />
           <motion.div
@@ -145,7 +167,7 @@ const HeroSection = () => {
               borderRadius: '12px',
               fontSize: '1.2rem',
               fontWeight: 'bold',
-              zIndex: 2
+              zIndex: 3
             }}
             aria-hidden="true"
           >

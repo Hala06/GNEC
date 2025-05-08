@@ -40,11 +40,11 @@ const SectionDivider = ({ variant = 1 }) => {
           strokeWidth="2"
           strokeOpacity="0.3"
           initial={{ pathLength: 0 }}
-          whileInView={{ 
+          whileInView={{
             pathLength: settings.reducedMotion ? 1 : 1,
-            transition: { 
-              duration: settings.reducedMotion ? 0 : 2, 
-              ease: "easeInOut" 
+            transition: {
+              duration: settings.reducedMotion ? 0 : 2,
+              ease: "easeInOut"
             }
           }}
         />
@@ -55,12 +55,12 @@ const SectionDivider = ({ variant = 1 }) => {
           strokeWidth="2"
           strokeOpacity="0.2"
           initial={{ pathLength: 0 }}
-          whileInView={{ 
+          whileInView={{
             pathLength: settings.reducedMotion ? 1 : 1,
-            transition: { 
-              duration: settings.reducedMotion ? 0 : 2.5, 
-              delay: settings.reducedMotion ? 0 : 0.5, 
-              ease: "easeInOut" 
+            transition: {
+              duration: settings.reducedMotion ? 0 : 2.5,
+              delay: settings.reducedMotion ? 0 : 0.5,
+              ease: "easeInOut"
             }
           }}
         />

@@ -21,7 +21,9 @@ export const AccessibilityProvider = ({ children }) => {
         pitch: 1.0,
         voice: null
       },
-      theme: ACCESSIBILITY_SETTINGS.THEMES.LIGHT,
+      theme: window.matchMedia('(prefers-color-scheme: dark)').matches 
+        ? ACCESSIBILITY_SETTINGS.THEMES.DARK 
+        : ACCESSIBILITY_SETTINGS.THEMES.LIGHT,
       isScreenReaderActive: false,
       reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches
     };
@@ -88,11 +90,15 @@ export const AccessibilityProvider = ({ children }) => {
   };
 
   const toggleTheme = () => {
-    const newTheme = settings.theme === ACCESSIBILITY_SETTINGS.THEMES.LIGHT
+    const currentTheme = settings.theme;
+    const newTheme = currentTheme === ACCESSIBILITY_SETTINGS.THEMES.LIGHT
       ? ACCESSIBILITY_SETTINGS.THEMES.DARK
       : ACCESSIBILITY_SETTINGS.THEMES.LIGHT;
     
-    updateSetting('theme', newTheme);
+    setSettings(prev => ({
+      ...prev,
+      theme: newTheme
+    }));
   };
 
   const toggleReducedMotion = () => {

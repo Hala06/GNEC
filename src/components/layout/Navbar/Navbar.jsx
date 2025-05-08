@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import CTAButton from '../../core/Buttons/CTAButton';
 import { useAccessibility } from '../../../contexts/AccessibilityContext';
+import browserIcons from '/assets/images/icons.jpg';
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const { settings, toggleTheme, toggleScreenReader } = useAccessibility();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -53,19 +55,27 @@ const Navbar = () => {
             fontWeight: 'bold',
             background: 'linear-gradient(135deg, var(--accent), var(--hover))',
             WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
+            WebkitTextFillColor: 'transparent',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
           }}
         >
-          GNEC
+          AccessEd
+          <img 
+            src={browserIcons} 
+            alt="Browser support icons"
+            style={{
+              height: '1.8rem',
+              borderRadius: '8px',
+              marginLeft: '0.5rem'
+            }}
+          />
         </motion.div>
       </Link>
 
       {/* Desktop Navigation */}
-      <div className="desktop-nav" style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: '2rem' 
-      }}>
+      <div className="desktop-nav">
         <div style={{ display: 'flex', gap: '1.5rem' }}>
           {navLinks.map((link, index) => (
             <motion.a
@@ -88,10 +98,10 @@ const Navbar = () => {
           ))}
         </div>
 
-        <div style={{ 
-          display: 'flex', 
-          gap: '1rem', 
-          alignItems: 'center' 
+        <div style={{
+          display: 'flex',
+          gap: '1rem',
+          alignItems: 'center'
         }}>
           <button
             onClick={toggleScreenReader}
@@ -121,19 +131,16 @@ const Navbar = () => {
             {settings.theme === 'light' ? '🌙' : '☀️'}
           </button>
 
-          <CTAButton 
-            text="Download" 
+          <CTAButton
+            text="Get Extension"
             variant="outline"
-            href="/download"
+            onClick={() => window.open('https://github.com/ket3l4/AccessEd', '_blank')}
           />
         </div>
       </div>
 
       {/* Mobile Navigation */}
-      <div className="mobile-nav" style={{ 
-        display: 'none',
-        position: 'relative'
-      }}>
+      <div className="mobile-nav">
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle menu"
@@ -151,6 +158,7 @@ const Navbar = () => {
 
         {mobileMenuOpen && (
           <motion.div
+            className="mobile-menu"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -163,10 +171,8 @@ const Navbar = () => {
               padding: '1rem',
               borderRadius: '8px',
               boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)',
-              minWidth: '200px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.5rem'
+              minWidth: '250px',
+              zIndex: 1000
             }}
           >
             {navLinks.map((link, index) => (
@@ -182,12 +188,18 @@ const Navbar = () => {
                   transition: 'background 0.2s ease'
                 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  const target = document.querySelector(link.path);
+                  if (target) {
+                    target.scrollIntoView({ behavior: settings.reducedMotion ? 'auto' : 'smooth' });
+                  }
+                }}
               >
                 {link.name}
               </motion.a>
             ))}
-            <div style={{
+            <div className="menu-footer" style={{
               display: 'flex',
               justifyContent: 'space-between',
               padding: '0.75rem 1rem',
@@ -218,7 +230,7 @@ const Navbar = () => {
                   color: 'var(--text)'
                 }}
               >
-                  {settings.theme === 'light' ? '🌙' : '☀️'}
+                {settings.theme === 'light' ? '🌙' : '☀️'}
               </button>
             </div>
           </motion.div>

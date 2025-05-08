@@ -6,7 +6,9 @@ const ScreenReader = () => {
   const { settings, updateSetting } = useAccessibility();
   const [activeText, setActiveText] = useState('');
   const [isReading, setIsReading] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const synthRef = useRef(null);
+  const helpTimeoutRef = useRef(null);
 
   useEffect(() => {
     synthRef.current = window.speechSynthesis;
@@ -14,7 +16,7 @@ const ScreenReader = () => {
     const handleMouseOver = (e) => {
       const element = e.target;
       let text = '';
-      
+     
       if (element.getAttribute('aria-label')) {
         text = element.getAttribute('aria-label');
       } else if (element.textContent && !element.closest('script, style')) {
@@ -24,15 +26,22 @@ const ScreenReader = () => {
       if (text) {
         setActiveText(text);
         highlightElement(element);
+        
+        // Show help tooltip for interactive elements
+        if (element.closest('button, a, [role="button"], [tabindex]')) {
+          setShowHelp(true);
+          clearTimeout(helpTimeoutRef.current);
+          helpTimeoutRef.current = setTimeout(() => setShowHelp(false), 3000);
+        }
       }
     };
 
     const highlightElement = (element) => {
       element.style.transition = 'all 0.3s ease';
-      element.style.outline = `2px solid ${settings.highlight.color}`;
-      
+      element.style.boxShadow = `0 0 0 2px ${settings.highlight.color}`;
+     
       setTimeout(() => {
-        element.style.outline = '';
+        element.style.boxShadow = '';
       }, 2000);
     };
 
@@ -49,6 +58,7 @@ const ScreenReader = () => {
       document.removeEventListener('mouseover', handleMouseOver);
       document.removeEventListener('click', handleClick);
       synthRef.current?.cancel();
+      clearTimeout(helpTimeoutRef.current);
     };
   }, [activeText, settings.isScreenReaderActive, settings.highlight.color]);
 
@@ -65,15 +75,16 @@ const ScreenReader = () => {
     utterance.voice = settings.speech.voice;
     utterance.onstart = () => setIsReading(true);
     utterance.onend = () => setIsReading(false);
+    utterance.onerror = () => setIsReading(false);
 
     synthRef.current.speak(utterance);
   };
 
   const toggleScreenReader = () => {
+    updateSetting('isScreenReaderActive', !settings.isScreenReaderActive);
     if (isReading) {
       synthRef.current?.cancel();
     }
-    updateSetting('isScreenReaderActive', !settings.isScreenReaderActive);
   };
 
   return (
@@ -88,14 +99,35 @@ const ScreenReader = () => {
         right: '20px',
         zIndex: 10000,
         display: 'flex',
-        gap: '10px'
+        gap: '10px',
+        alignItems: 'flex-end'
       }}
     >
+      {showHelp && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          style={{
+            background: 'var(--background)',
+            color: 'var(--text)',
+            padding: '8px 12px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            fontSize: '0.9rem',
+            maxWidth: '200px',
+            marginRight: '10px'
+          }}
+        >
+          Click to read aloud. Double-click to activate.
+        </motion.div>
+      )}
+
       <button
         onClick={toggleScreenReader}
         aria-label={settings.isScreenReaderActive ? 'Turn off screen reader' : 'Turn on screen reader'}
         style={{
-          padding: '12px',
+          padding: '14px',
           borderRadius: '50%',
           background: settings.isScreenReaderActive ? 'var(--accent)' : 'var(--secondary)',
           color: settings.isScreenReaderActive ? 'white' : 'var(--text)',
@@ -104,7 +136,8 @@ const ScreenReader = () => {
           fontSize: '1.2rem',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
         }}
       >
         {settings.isScreenReaderActive ? '🔊' : '🔇'}
@@ -112,8 +145,8 @@ const ScreenReader = () => {
 
       {settings.isScreenReaderActive && (
         <button
-          onClick={() => readText(activeText)}
-          disabled={!activeText || isReading}
+          onClick={() => isReading ? synthRef.current.cancel() : readText(activeText)}
+          disabled={!activeText}
           aria-label={isReading ? 'Stop reading' : 'Read highlighted text'}
           style={{
             padding: '12px 16px',
@@ -125,7 +158,9 @@ const ScreenReader = () => {
             fontWeight: 'bold',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '8px',
+            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+            opacity: activeText ? 1 : 0.6
           }}
         >
           {isReading ? '⏹ Stop' : '▶ Read'}

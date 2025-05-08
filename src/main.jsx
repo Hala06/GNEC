@@ -5,8 +5,8 @@ import { AnimatePresence } from 'framer-motion';
 import App from './App';
 
 // Styles
-import './styles/global.css';
-import './styles/theme.css';
+import './styles/themes/global.scss';
+import './styles/themes/theme.scss';
 
 // Initialize the app
 const root = ReactDOM.createRoot(document.getElementById('root'));

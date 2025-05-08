@@ -4,7 +4,7 @@ import { useAccessibility } from '../contexts/AccessibilityContext';
 export const useScreenReader = () => {
   const { settings } = useAccessibility();
   const synthRef = useRef(null);
-  const utteranceRef = useRef(null);
+  const currentUtterance = useRef(null);
 
   useEffect(() => {
     synthRef.current = window.speechSynthesis;
@@ -24,57 +24,23 @@ export const useScreenReader = () => {
     }
 
     // Create new utterance
-    utteranceRef.current = new SpeechSynthesisUtterance(text);
-
-    // Apply settings and options
-    const {
-      rate = settings.speech.rate,
-      pitch = settings.speech.pitch,
-      voice = settings.speech.voice,
-      onStart,
-      onEnd,
-      onError
-    } = options;
-
-    utteranceRef.current.rate = rate;
-    utteranceRef.current.pitch = pitch;
-    utteranceRef.current.voice = voice;
-    utteranceRef.current.lang = voice?.lang || 'en-US';
-
-    // Event handlers
-    if (onStart) utteranceRef.current.onstart = onStart;
-    if (onEnd) utteranceRef.current.onend = onEnd;
-    if (onError) utteranceRef.current.onerror = onError;
+    currentUtterance.current = new SpeechSynthesisUtterance(text);
+    const { rate = 1, pitch = 1, voice = null } = options;
+    
+    // Apply settings
+    currentUtterance.current.rate = rate * settings.speech.rate;
+    currentUtterance.current.pitch = pitch * settings.speech.pitch;
+    currentUtterance.current.voice = voice || settings.speech.voice;
+    currentUtterance.current.lang = (voice || settings.speech.voice)?.lang || 'en-US';
 
     // Speak
-    synthRef.current.speak(utteranceRef.current);
+    synthRef.current.speak(currentUtterance.current);
   };
 
-  const stop = () => {
-    if (synthRef.current?.speaking) {
-      synthRef.current.cancel();
-    }
-  };
-
-  const pause = () => {
-    if (synthRef.current?.speaking) {
-      synthRef.current.pause();
-    }
-  };
-
-  const resume = () => {
-    if (synthRef.current?.paused) {
-      synthRef.current.resume();
-    }
-  };
-
-  return { 
-    speak, 
-    stop, 
-    pause, 
-    resume, 
+  return {
+    speak,
+    stop: () => synthRef.current?.cancel(),
     isActive: settings.isScreenReaderActive,
-    isSpeaking: synthRef.current?.speaking || false,
-    isPaused: synthRef.current?.paused || false
+    isSpeaking: synthRef.current?.speaking || false
   };
 };

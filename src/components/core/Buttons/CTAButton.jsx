@@ -10,14 +10,16 @@ const CTAButton = ({
   fullWidth = false,
   icon,
   disabled = false,
-  ariaLabel
+  ariaLabel,
+  className = "",
+  type = "button"
 }) => {
   const { settings } = useAccessibility();
   const navigate = useNavigate();
 
   const handleClick = (e) => {
     if (disabled) return;
-    
+   
     if (href) {
       e.preventDefault();
       navigate(href);
@@ -25,67 +27,43 @@ const CTAButton = ({
     if (onClick) onClick(e);
   };
 
-  const variants = {
-    primary: {
-      background: `linear-gradient(135deg, var(--accent), var(--hover))`,
-      color: 'var(--background)',
-      hover: { 
-        scale: settings.reducedMotion ? 1 : 1.05, 
-        boxShadow: '0 4px 12px rgba(var(--accent-rgb), 0.3)'
-      }
-    },
-    secondary: {
-      background: 'var(--secondary)',
-      color: 'var(--text)',
-      hover: { 
-        scale: settings.reducedMotion ? 1 : 1.05,
-        background: 'var(--hover)'
-      }
-    },
-    outline: {
-      background: 'transparent',
-      color: 'var(--accent)',
-      border: '2px solid var(--accent)',
-      hover: { 
-        scale: settings.reducedMotion ? 1 : 1.05,
-        background: 'rgba(var(--accent-rgb), 0.1)'
-      }
-    }
+  const hoverAnimation = disabled || settings.reducedMotion ? {} : {
+    scale: 1.05,
+    y: -2,
+    boxShadow: variant === 'primary' ? '0 6px 16px rgba(var(--accent-rgb), 0.3)' : '0 6px 16px rgba(0,0,0,0.1)'
   };
 
   return (
     <motion.button
-      className={`cta-button ${variant} ${fullWidth ? 'full-width' : ''}`}
+      className={`btn btn--${variant} ${fullWidth ? 'btn--full' : ''} ${className}`}
       onClick={handleClick}
-      whileHover={disabled ? {} : variants[variant].hover}
+      whileHover={hoverAnimation}
       whileTap={disabled ? {} : { scale: 0.98 }}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       disabled={disabled}
       aria-label={ariaLabel || text}
+      type={type}
       style={{
-        padding: '1rem 1.5rem',
-        borderRadius: '50px',
-        border: 'none',
-        fontSize: '1.1rem',
-        fontWeight: '600',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '0.5rem',
-        width: fullWidth ? '100%' : 'auto',
-        opacity: disabled ? 0.7 : 1,
-        ...variants[variant]
+        '--accent-rgb': '139, 135, 216', // Purple
+        '--hover-rgb': '165, 161, 229' // Lighter purple
       }}
     >
-      {icon && <span style={{ display: 'flex' }}>{icon}</span>}
-      {text}
-      {!disabled && (
+      {icon && <span className="btn__icon">{icon}</span>}
+      <span className="btn__text">{text}</span>
+      {!disabled && variant === 'primary' && (
         <motion.span
-          animate={settings.reducedMotion ? {} : { x: [0, 4, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
+          className="btn__arrow"
+          animate={settings.reducedMotion ? {} : { 
+            x: [0, 4, 0],
+            opacity: [1, 0.8, 1]
+          }}
+          transition={{ 
+            repeat: Infinity, 
+            duration: 1.5,
+            ease: "easeInOut"
+          }}
         >
           →
         </motion.span>

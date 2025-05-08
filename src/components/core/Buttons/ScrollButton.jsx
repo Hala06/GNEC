@@ -13,7 +13,7 @@ const ScrollButton = ({ containerRef }) => {
       const currentScroll = window.scrollY;
       setDirection(currentScroll > lastScroll ? 'down' : 'up');
       setVisible(
-        currentScroll > 300 && 
+        currentScroll > 300 &&
         currentScroll < document.body.scrollHeight - window.innerHeight - 100
       );
       setLastScroll(currentScroll);
@@ -37,8 +37,8 @@ const ScrollButton = ({ containerRef }) => {
           key="scroll-button"
           onClick={scrollTo}
           initial={{ opacity: 0, y: 20 }}
-          animate={{ 
-            opacity: 1, 
+          animate={{
+            opacity: 1,
             y: 0,
             transition: { duration: settings.reducedMotion ? 0 : 0.3 }
           }}
@@ -49,10 +49,10 @@ const ScrollButton = ({ containerRef }) => {
           aria-label={direction === 'up' ? 'Scroll to top' : 'Scroll to bottom'}
           style={{
             position: 'fixed',
-            bottom: '2rem',
+            bottom: '5rem', // Moved up to avoid overlap
             right: '2rem',
-            width: '3.5rem',
-            height: '3.5rem',
+            width: '3rem',
+            height: '3rem',
             borderRadius: '50%',
             background: 'var(--accent)',
             color: 'var(--background)',
@@ -61,7 +61,7 @@ const ScrollButton = ({ containerRef }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '1.5rem',
+            fontSize: '1.2rem',
             zIndex: 100,
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
           }}

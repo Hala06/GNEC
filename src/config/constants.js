@@ -7,8 +7,8 @@ export const ACCESSIBILITY_SETTINGS = {
   },
   HIGHLIGHT: {
     COLORS: [
-      'rgba(255, 215, 0, 0.3)', 
-      'rgba(74, 144, 168, 0.3)', 
+      'rgba(255, 215, 0, 0.3)',
+      'rgba(74, 144, 168, 0.3)',
       'rgba(139, 135, 216, 0.3)'
     ],
     STYLES: ['solid', 'dashed', 'double']

@@ -1,77 +1,34 @@
-import { useEffect, useRef } from 'react';
-import { initTheme } from './utils/helpers';
+import { useEffect } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
-
-// Layout Components
-import Navbar from './components/layout/Navbar/Navbar';
-import Footer from './components/layout/Footer/Footer';
-
-// UI Components
-import BackgroundBlobs from './components/Ui/BackgroundBlobs';
-import Stars from './components/Ui/Stars';
-import SectionDivider from './components/Ui/SectionDivider';
-import ScrollButton from './components/core/ScrollButton';
-
-// Section Components
-import HeroSection from './components/sections/Hero/HeroSection';
-import Features from './components/sections/Features/Features';
-import TextToSpeechDemo from './components/sections/Demo/TextToSpeechAndClickToRead';
-import About from './components/sections/About/About';
-
-// Accessibility Components
+import MainLayout from './layouts/MainLayout';
+import HomePage from './pages/Home/HomePage';
 import CursorHighlighter from './components/accessibility/CursorHighlighter';
 import FocusBorder from './components/accessibility/FocusBorder';
 import ScreenReader from './components/accessibility/ScreenReader';
 
 function App() {
-  const appRef = useRef();
-
-  // Initialize theme and accessibility features
   useEffect(() => {
-    initTheme();
-    
-    // Add skip link target
-    if (!document.getElementById('main-content')) {
-      const main = document.createElement('main');
-      main.id = 'main-content';
-      main.tabIndex = -1;
-      document.body.appendChild(main);
-    }
+    // Initialize theme
+    document.documentElement.setAttribute('data-theme', 'light');
   }, []);
 
   return (
     <AccessibilityProvider>
-      <div className="app-container" ref={appRef}>
-        {/* Skip link for keyboard users */}
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
+      {/* Accessibility Tools */}
+      <CursorHighlighter />
+      <FocusBorder />
+      <ScreenReader />
 
-        {/* Visual Effects */}
-        <BackgroundBlobs />
-        <Stars />
+      {/* Skip link for keyboard users */}
+      <a href="#main-content" className="sr-only">
+        Skip to main content
+      </a>
 
-        {/* Accessibility Features */}
-        <CursorHighlighter />
-        <FocusBorder />
-        <ScreenReader />
-       
-        {/* Main Layout */}
-        <Navbar />
-       
-        <main id="main-content" className="content-wrapper">
-          <HeroSection />
-          <SectionDivider variant={1} />
-          <Features />
-          <SectionDivider variant={2} />
-          <TextToSpeechDemo />
-          <SectionDivider variant={3} />
-          <About />
-        </main>
-       
-        <Footer />
-        <ScrollButton containerRef={appRef} />
-      </div>
+      {/* Main Routes */}
+      <Routes>
+        <Route path="/" element={<MainLayout><HomePage /></MainLayout>} />
+      </Routes>
     </AccessibilityProvider>
   );
 }

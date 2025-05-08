@@ -5,25 +5,23 @@ import { useAccessibility } from '/src/contexts/AccessibilityContext';
 const FocusBorder = () => {
   const { settings } = useAccessibility();
   const [activeElement, setActiveElement] = useState(null);
-  const [dimensions, setDimensions] = useState({ 
-    width: 0, 
-    height: 0, 
-    x: 0, 
-    y: 0 
+  const [dimensions, setDimensions] = useState({
+    width: 0,
+    height: 0,
+    x: 0,
+    y: 0
   });
 
   useEffect(() => {
     const handleFocus = (e) => {
       const focusableElements = [
-        'BUTTON', 'A', 'INPUT', 'SELECT', 'TEXTAREA', 
-        '[role="button"]', '[role="link"]', '[tabindex]'
-      ];
+        'button', 'a', 'input', 'select', 'textarea',
+        '[role="button"]', '[role="link"]', '[tabindex]:not([tabindex="-1"])'
+      ].join(',');
       
-      if (focusableElements.some(selector => 
-        e.target.matches(selector) || 
-        e.target.closest(selector)
-      )) {
-        const element = e.target.closest(focusableElements.join(',')) || e.target;
+      const element = e.target.closest(focusableElements) || e.target;
+      
+      if (element && focusableElements.includes(element.tagName.toLowerCase())) {
         setActiveElement(element);
         const rect = element.getBoundingClientRect();
         setDimensions({
@@ -50,23 +48,31 @@ const FocusBorder = () => {
     <motion.div
       className="focus-border"
       animate={{
-        x: dimensions.x - 4,
-        y: dimensions.y - 4,
-        width: dimensions.width + 8,
-        height: dimensions.height + 8,
-        opacity: activeElement ? 1 : 0
+        x: dimensions.x - 6,
+        y: dimensions.y - 6,
+        width: dimensions.width + 12,
+        height: dimensions.height + 12,
+        opacity: activeElement ? 1 : 0,
+        scale: activeElement ? 1 : 0.9
       }}
-      transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+      transition={{ 
+        type: 'spring', 
+        damping: 25, 
+        stiffness: 400,
+        opacity: { duration: 0.2 }
+      }}
       style={{
         position: 'fixed',
-        borderRadius: '6px',
-        border: `2px solid ${settings.highlight.color}`,
+        borderRadius: '8px',
+        border: `3px solid ${settings.highlight.color}`,
         pointerEvents: 'none',
         zIndex: 9998,
-        boxShadow: `0 0 0 2px ${settings.highlight.color}20`
+        boxShadow: `0 0 0 2px ${settings.highlight.color}20`,
+        background: `${settings.highlight.color}10`,
+        transformOrigin: 'center'
       }}
     />
   );
 };
 
-export default FocusBorder;
+export default FocusBorder; 

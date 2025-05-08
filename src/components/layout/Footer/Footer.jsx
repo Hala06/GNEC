@@ -5,11 +5,11 @@ import { useAccessibility } from '/src/contexts/AccessibilityContext';
 const Footer = () => {
   const { settings } = useAccessibility();
   const currentYear = new Date().getFullYear();
-  
+ 
   const links = [
     { name: 'Privacy', path: '/privacy' },
     { name: 'Terms', path: '/terms' },
-    { name: 'GitHub', path: 'https://github.com/ket3l4/Listen-Up', external: true },
+    { name: 'GitHub', path: 'https://github.com/ket3l4/AccessEd', external: true },
     { name: 'Contact', path: '/contact' },
     { name: 'Accessibility', path: '/accessibility' }
   ];
@@ -52,7 +52,7 @@ const Footer = () => {
               WebkitTextFillColor: 'transparent'
             }}
           >
-            GNEC
+            AccessEd
           </motion.div>
 
           <nav aria-label="Footer navigation" style={{
@@ -111,13 +111,14 @@ const Footer = () => {
           textAlign: 'center'
         }}>
           <p style={{ margin: 0 }}>
-            © {currentYear} GNEC. All rights reserved.
+            © {currentYear} AccessEd. All rights reserved.
           </p>
           <p style={{ margin: 0 }}>
-            Made with <span aria-label="love">❤️</span> for the GNEC Hackathon 2025
+            Made with <span aria-label="love">❤️</span> for the Accessibility Hackathon
           </p>
           <p style={{ margin: 0, fontSize: '0.8rem' }}>
-            Accessibility Mode: {settings.isScreenReaderActive ? 'On' : 'Off'}
+            Current Mode: {settings.theme === 'light' ? 'Light' : 'Dark'} • 
+            Screen Reader: {settings.isScreenReaderActive ? 'On' : 'Off'}
           </p>
         </div>
       </div>

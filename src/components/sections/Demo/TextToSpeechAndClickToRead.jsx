@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import CTAButton from '../../../components/core/Buttons/CTAButton';
 import { useAccessibility } from '../../../contexts/AccessibilityContext';
+import { speakText, highlightElementForReading } from '../../../services/speechSynthesis';
 
 const TextToSpeechAndClickToRead = () => {
   const { settings, updateSetting } = useAccessibility();
@@ -10,30 +10,34 @@ const TextToSpeechAndClickToRead = () => {
   const [selectedVoice, setSelectedVoice] = useState('');
   const [language, setLanguage] = useState('en-US');
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const synth = window.speechSynthesis;
+  const [activeElement, setActiveElement] = useState(null);
 
   const loadVoices = useCallback(() => {
-    const availableVoices = synth.getVoices();
+    const availableVoices = window.speechSynthesis.getVoices();
     setVoices(availableVoices);
-    
+   
     if (availableVoices.length > 0 && !selectedVoice) {
       const defaultVoice = availableVoices.find(v => v.default) || availableVoices[0];
       setSelectedVoice(defaultVoice.voiceURI);
-      updateSetting('speech', { 
-        ...settings.speech, 
-        voice: defaultVoice 
+      updateSetting('speech', {
+        ...settings.speech,
+        voice: defaultVoice
       });
     }
-  }, [synth, selectedVoice, settings.speech, updateSetting]);
+  }, [selectedVoice, settings.speech, updateSetting]);
 
   useEffect(() => {
-    synth.addEventListener('voiceschanged', loadVoices);
+    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
     loadVoices();
-    return () => synth.removeEventListener('voiceschanged', loadVoices);
-  }, [loadVoices, synth]);
+    return () => {
+      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+    };
+  }, [loadVoices]);
 
   const handleSpeak = (content) => {
-    if (synth.speaking) synth.cancel();
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+    }
 
     const utterance = new SpeechSynthesisUtterance(content || text);
     utterance.voice = voices.find(v => v.voiceURI === selectedVoice);
@@ -42,31 +46,31 @@ const TextToSpeechAndClickToRead = () => {
     utterance.pitch = settings.speech.pitch;
 
     utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      if (activeElement) {
+        activeElement.style.backgroundColor = '';
+      }
+    };
 
-    synth.speak(utterance);
+    window.speechSynthesis.speak(utterance);
   };
 
-  const handleVoiceChange = (e) => {
-    const voiceURI = e.target.value;
-    setSelectedVoice(voiceURI);
-    const voice = voices.find(v => v.voiceURI === voiceURI);
-    updateSetting('speech', { 
-      ...settings.speech, 
-      voice: voice 
-    });
-  };
-
-  const handleLanguageChange = (e) => {
-    const lang = e.target.value;
-    setLanguage(lang);
-    const voiceForLang = voices.find(v => v.lang === lang) || voices[0];
-    setSelectedVoice(voiceForLang?.voiceURI || '');
+  const handleElementClick = (e, content) => {
+    const element = e.currentTarget;
+    setActiveElement(element);
+    
+    // Highlight element
+    element.style.transition = 'background-color 0.3s ease';
+    element.style.backgroundColor = `${settings.highlight.color}30`;
+    
+    // Speak content
+    handleSpeak(content || element.textContent);
   };
 
   return (
     <motion.section
-      id="text-to-speech"
+      id="demo"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -100px 0px" }}
@@ -77,17 +81,15 @@ const TextToSpeechAndClickToRead = () => {
         margin: '4rem auto',
         borderRadius: '24px'
       }}
+      aria-labelledby="demo-heading"
     >
-      <div style={{
-        textAlign: 'center',
-        marginBottom: '4rem'
-      }}>
-        <h2 style={{
+      <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+        <h2 id="demo-heading" style={{
           fontSize: '2.5rem',
           marginBottom: '1rem',
           color: 'var(--text)'
         }}>
-          Interactive Reader
+          Interactive Demo
         </h2>
         <p style={{
           color: 'var(--text)',
@@ -96,8 +98,8 @@ const TextToSpeechAndClickToRead = () => {
           margin: '0 auto',
           lineHeight: '1.6'
         }}>
-          Click or tap on any text box to hear it read aloud. The boxes will remain visible while reading.
-          Move your cursor away from a box to stop reading. Use the controls panel to adjust voice and speed settings.
+          Click on any text element to hear it read aloud. The element will highlight while reading.
+          Use the controls to adjust voice and speed settings.
         </p>
       </div>
 
@@ -116,7 +118,10 @@ const TextToSpeechAndClickToRead = () => {
             position: 'sticky',
             top: '100px'
           }}
+          whileHover={settings.reducedMotion ? {} : { y: -5 }}
         >
+          <h3 style={{ marginBottom: '1.5rem', color: 'var(--accent)' }}>Settings</h3>
+          
           <div style={{ marginBottom: '2rem' }}>
             <label htmlFor="language-select" style={{
               display: 'block',
@@ -129,7 +134,7 @@ const TextToSpeechAndClickToRead = () => {
             <select
               id="language-select"
               value={language}
-              onChange={handleLanguageChange}
+              onChange={(e) => setLanguage(e.target.value)}
               style={{
                 width: '100%',
                 padding: '1rem',
@@ -144,7 +149,6 @@ const TextToSpeechAndClickToRead = () => {
               <option value="en-GB">English (UK)</option>
               <option value="es-ES">Spanish</option>
               <option value="fr-FR">French</option>
-              <option value="ar-SA">Arabic</option>
             </select>
           </div>
 
@@ -160,7 +164,7 @@ const TextToSpeechAndClickToRead = () => {
             <select
               id="voice-select"
               value={selectedVoice}
-              onChange={handleVoiceChange}
+              onChange={(e) => setSelectedVoice(e.target.value)}
               style={{
                 width: '100%',
                 padding: '1rem',
@@ -207,14 +211,24 @@ const TextToSpeechAndClickToRead = () => {
             />
           </div>
 
-          <CTAButton
-            text={isSpeaking ? 'Stop Reading' : 'Read Text'}
-            onClick={() => isSpeaking ? synth.cancel() : handleSpeak()}
-            variant={isSpeaking ? 'secondary' : 'primary'}
-            fullWidth
+          <button
+            onClick={() => isSpeaking ? window.speechSynthesis.cancel() : handleSpeak()}
             disabled={!text && !isSpeaking}
-            ariaLabel={isSpeaking ? 'Stop reading' : 'Read text aloud'}
-          />
+            aria-label={isSpeaking ? 'Stop reading' : 'Read text aloud'}
+            style={{
+              width: '100%',
+              padding: '1rem',
+              borderRadius: '8px',
+              background: isSpeaking ? 'var(--error)' : 'var(--accent)',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              fontSize: '1rem'
+            }}
+          >
+            {isSpeaking ? '⏹ Stop Reading' : '▶ Read Text'}
+          </button>
         </motion.div>
 
         {/* Content Area */}
@@ -226,52 +240,59 @@ const TextToSpeechAndClickToRead = () => {
             minHeight: '400px'
           }}
         >
-          <label htmlFor="text-input" style={{
-            display: 'block',
-            marginBottom: '1rem',
-            fontWeight: '600',
-            color: 'var(--text)'
-          }}>
-            Enter text to read:
-          </label>
-          <textarea
-            id="text-input"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Type or paste text here..."
-            style={{
-              width: '100%',
-              minHeight: '200px',
-              padding: '1.5rem',
-              borderRadius: '12px',
-              border: '2px solid var(--border)',
-              background: 'var(--background)',
-              color: 'var(--text)',
-              fontSize: '1.1rem',
-              lineHeight: '1.6',
-              marginBottom: '2rem'
-            }}
-            aria-label="Text input for speech synthesis"
-          />
+          <div style={{ marginBottom: '2rem' }}>
+            <label htmlFor="text-input" style={{
+              display: 'block',
+              marginBottom: '1rem',
+              fontWeight: '600',
+              color: 'var(--text)'
+            }}>
+              Try reading your own text:
+            </label>
+            <textarea
+              id="text-input"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Type or paste text here to hear it read aloud..."
+              style={{
+                width: '100%',
+                minHeight: '150px',
+                padding: '1.5rem',
+                borderRadius: '12px',
+                border: '2px solid var(--border)',
+                background: 'var(--background)',
+                color: 'var(--text)',
+                fontSize: '1.1rem',
+                lineHeight: '1.6'
+              }}
+              aria-label="Text input for speech synthesis"
+              onClick={(e) => handleElementClick(e, text)}
+            />
+          </div>
 
+          <h3 style={{ marginBottom: '1.5rem', color: 'var(--accent)' }}>Sample Content</h3>
+          
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
             gap: '1.5rem'
           }}>
-            {['Welcome message', 'Quick help', 'Tutorial'].map((title, index) => (
+            {[
+              "AccessEd helps make the web accessible to everyone with features like text-to-speech, focus highlighting, and customizable cursors.",
+              "Our mission is to break down digital barriers and create an inclusive browsing experience for users of all abilities.",
+              "Try hovering over interactive elements to see them highlight, then click to hear them read aloud."
+            ].map((content, index) => (
               <motion.div
                 key={index}
                 initial={false}
                 animate={{
-                  opacity: isSpeaking ? 0.7 : 1,
-                  scale: isSpeaking ? 0.98 : 1,
+                  opacity: isSpeaking && activeElement?.textContent === content ? 0.9 : 1,
+                  scale: isSpeaking && activeElement?.textContent === content ? 0.98 : 1,
                 }}
                 whileHover={settings.reducedMotion ? {} : {
                   y: -2,
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                  scale: 1.02,
-                  borderColor: 'var(--accent)'
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                  scale: 1.02
                 }}
                 whileTap={{ scale: 0.95 }}
                 style={{
@@ -280,35 +301,21 @@ const TextToSpeechAndClickToRead = () => {
                   borderRadius: '12px',
                   border: '2px solid var(--border)',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  position: 'relative',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
                   transition: 'all 0.3s ease'
                 }}
-                onClick={() => handleSpeak(title)}
-                aria-label={`Click to hear: ${title}`}
+                onClick={(e) => handleElementClick(e, content)}
+                aria-label={`Click to hear: ${content.substring(0, 30)}...`}
                 role="button"
                 tabIndex="0"
               >
-                <h3 style={{ 
-                  marginBottom: '1rem', 
-                  color: 'var(--accent)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}>
-                  {isSpeaking && (
-                    <span role="img" aria-label="Speaking" style={{ fontSize: '1rem' }}>
-                      🔊
-                    </span>
-                  )}
-                  {title}
-                </h3>
-                <p style={{ 
-                  color: 'var(--text)', 
-                  opacity: 0.8,
+                <p style={{
+                  color: 'var(--text)',
+                  lineHeight: '1.6',
                   position: 'relative'
                 }}>
-                  <span style={{ 
+                  {content}
+                  <span style={{
                     position: 'absolute',
                     right: '-10px',
                     bottom: '-10px',
@@ -316,7 +323,6 @@ const TextToSpeechAndClickToRead = () => {
                   }}>
                     🔈
                   </span>
-                  Click to hear this section read aloud
                 </p>
               </motion.div>
             ))}

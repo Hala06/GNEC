@@ -50,7 +50,11 @@ const Star = ({ x, y, size, delay, mouseX, mouseY, reducedMotion }) => {
 
 const Stars = () => {
   const { settings } = useAccessibility();
-  const stars = Array.from({ length: settings.reducedMotion ? 10 : 40 }, (_, i) => ({
+  
+  // Only show stars in dark mode
+  if (settings.theme !== 'dark') return null;
+
+  const stars = Array.from({ length: settings.reducedMotion ? 15 : 50 }, (_, i) => ({
     x: Math.random() * 100,
     y: Math.random() * 100,
     size: Math.random() * 3 + 1,
@@ -66,13 +70,13 @@ const Stars = () => {
       height: '100%',
       pointerEvents: 'none',
       zIndex: 0,
-      color: 'var(--star-color)'
+      color: 'rgba(255, 255, 255, 0.7)'
     }}>
       {stars.map((star, i) => (
-        <Star 
-          key={i} 
-          {...star} 
-          reducedMotion={settings.reducedMotion} 
+        <Star
+          key={i}
+          {...star}
+          reducedMotion={settings.reducedMotion}
         />
       ))}
     </div>

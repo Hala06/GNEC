@@ -127,6 +127,11 @@ body {
   outline-offset: 2px;
 }
 
+/* Why section hover styles */
+#why a:hover {
+  box-shadow: 0 8px 24px rgba(var(--text-rgb),0.1) !important;
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,

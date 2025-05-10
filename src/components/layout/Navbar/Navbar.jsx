@@ -230,7 +230,7 @@ const Navbar = () => {
                   color: 'var(--text)'
                 }}
               >
-                {settings.theme === 'light' ? '🌙' : '☀️'}
+              {settings.theme === 'light' ? '🌙' : '☀️'}
               </button>
             </div>
           </motion.div>

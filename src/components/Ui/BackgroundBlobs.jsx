@@ -6,9 +6,9 @@ const BackgroundBlobs = () => {
  
   const colors = settings.theme === 'dark' 
     ? [
-        'rgba(168, 216, 185, 0.15)', // Mint
-        'rgba(255, 182, 193, 0.15)', // Pink
-        'rgba(139, 135, 216, 0.15)'  // Purple
+        'rgba(168, 216, 185, 0.45)', // Mint
+        'rgba(255, 182, 193, 0.45)', // Pink
+        'rgba(139, 135, 216, 0.45)'  // Purple
       ]
     : [
         'rgba(255, 223, 186, 0.2)',  // Light peach
@@ -31,9 +31,9 @@ const BackgroundBlobs = () => {
         0
       ],
       scale: settings.reducedMotion ? 1 : [1, 1.3, 0.8, 1],
-      opacity: [0.4, 0.6, 0.3, 0.4],
+      opacity: settings.theme === 'dark' ? [0.5, 0.8, 0.5, 0.8] : [0.4, 0.6, 0.3, 0.4],
       transition: {
-        duration: 20 + i * 5,
+        duration: 15 + i * 3,
         repeat: Infinity,
         repeatType: 'reverse',
         ease: "easeInOut"
@@ -41,12 +41,17 @@ const BackgroundBlobs = () => {
     })
   };
 
-  const blobs = [
-    { size: 400, color: colors[0], x: '10%', y: '10%' },
-    { size: 500, color: colors[1], x: '80%', y: '30%' },
-    { size: 450, color: colors[2], x: '30%', y: '70%' },
-    { size: 350, color: colors[0], x: '70%', y: '80%' }
-  ];
+  const blobs = settings.reducedMotion 
+    ? [
+        { size: 450, color: colors[1], x: '50%', y: '30%' },
+        { size: 400, color: colors[2], x: '30%', y: '70%' }
+      ]
+    : [
+        { size: 400, color: colors[0], x: '10%', y: '10%' },
+        { size: 500, color: colors[1], x: '80%', y: '30%' },
+        { size: 450, color: colors[2], x: '30%', y: '70%' },
+        { size: 350, color: colors[0], x: '70%', y: '80%' }
+      ];
 
   return (
     <div style={{
@@ -58,7 +63,7 @@ const BackgroundBlobs = () => {
       overflow: 'hidden',
       zIndex: -1,
       pointerEvents: 'none',
-      opacity: settings.theme === 'dark' ? 0.3 : 0.6
+      opacity: settings.theme === 'dark' ? 0.8 : 0.6
     }}>
       {blobs.map((blob, i) => (
         <motion.div
@@ -73,10 +78,10 @@ const BackgroundBlobs = () => {
             height: blob.size,
             borderRadius: '50%',
             background: blob.color,
-            filter: 'blur(60px)',
+            filter: 'blur(40px)',
             left: blob.x,
             top: blob.y,
-            mixBlendMode: 'soft-light',
+            mixBlendMode: settings.theme === 'dark' ? 'screen' : 'soft-light',
             willChange: 'transform'
           }}
           aria-hidden="true"

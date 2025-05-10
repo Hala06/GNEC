@@ -2,13 +2,11 @@ import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { useEffect } from 'react';
 import { useAccessibility } from '/src/contexts/AccessibilityContext';
 
-const Star = ({ x, y, size, delay, mouseX, mouseY, reducedMotion }) => {
+const Star = ({ x, y, size, delay }) => {
   const distance = useMotionValue(0);
-  const scale = useTransform(distance, [0, 0.5], [1, reducedMotion ? 1 : 1.5]);
+  const scale = useTransform(distance, [0, 0.5], [1, 1.5]);
 
   useEffect(() => {
-    if (reducedMotion) return;
-
     const handleMouseMove = (e) => {
       const starX = x * window.innerWidth / 100;
       const starY = y * window.innerHeight / 100;
@@ -18,7 +16,7 @@ const Star = ({ x, y, size, delay, mouseX, mouseY, reducedMotion }) => {
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [x, y, distance, reducedMotion]);
+  }, [x, y, distance]);
 
   return (
     <motion.div
@@ -33,12 +31,12 @@ const Star = ({ x, y, size, delay, mouseX, mouseY, reducedMotion }) => {
         scale,
         opacity: 0.8
       }}
-      animate={reducedMotion ? {} : {
-        opacity: [0.2, 0.8, 0.2],
-        scale: [0.8, 1.2, 0.8]
+      animate={{
+        opacity: [0.3, 0.7, 0.3],
+        scale: [0.9, 1.1, 0.9]
       }}
       transition={{
-        duration: reducedMotion ? 0 : 3 + Math.random() * 2,
+        duration: 2 + Math.random() * 1.5,
         delay,
         repeat: Infinity,
         ease: "easeInOut"
@@ -50,11 +48,8 @@ const Star = ({ x, y, size, delay, mouseX, mouseY, reducedMotion }) => {
 
 const Stars = () => {
   const { settings } = useAccessibility();
-  
-  // Only show stars in dark mode
-  if (settings.theme !== 'dark') return null;
 
-  const stars = Array.from({ length: settings.reducedMotion ? 15 : 50 }, (_, i) => ({
+  const stars = Array.from({ length: 50 }, (_, i) => ({
     x: Math.random() * 100,
     y: Math.random() * 100,
     size: Math.random() * 3 + 1,
@@ -76,7 +71,6 @@ const Stars = () => {
         <Star
           key={i}
           {...star}
-          reducedMotion={settings.reducedMotion}
         />
       ))}
     </div>
